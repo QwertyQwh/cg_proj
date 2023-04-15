@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack-dev-server --config webpack.dev.js --open",
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,18 @@
   "bugs": {
     "url": "https://github.com/QwertyQwh/cg_proj/issues"
   },
-  "homepage": "https://github.com/QwertyQwh/cg_proj#readme"
+  "homepage": "https://github.com/QwertyQwh/cg_proj#readme",
+  "dependencies": {
+    "webpack-dev-server": "^4.13.3"
+  },
+  "devDependencies": {
+    "babel-loader": "^9.1.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.3",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.1",
+    "style-loader": "^3.3.2",
+    "webpack-cli": "^5.0.1"
+  }
 }

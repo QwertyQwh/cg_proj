@@ -71,7 +71,7 @@ module.exports = {
     new CleanWebpackPlugin()
     ,new CopyPlugin({
       patterns: [
-          { from: "src/assets/model",to:"assets/model" }
+          { from: "src/assets/models",to:"assets/models" }
       ]}),
     new webpack.HotModuleReplacementPlugin(),
   ]
