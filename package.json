@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/QwertyQwh/cg_proj#readme",
   "dependencies": {
+    "gl-matrix": "^3.4.3",
+    "mathjs": "^11.8.0",
     "webpack-dev-server": "^4.13.3"
   },
   "devDependencies": {
