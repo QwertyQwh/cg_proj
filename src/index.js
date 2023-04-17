@@ -1,7 +1,7 @@
 import './style.css'
 import vert from './shaders/vert'
 import frag from './shaders/frag'
-import { initShaderProgram } from './utils'
+import { initShaderProgram,resizeCanvasToDisplaySize } from './utils'
 import { initBuffers } from './cube'
 import { drawScene } from './drawscene'
 let cubeRotation = 0.0;
@@ -23,10 +23,10 @@ const cursor = {
     y:0
 }
 
-window.addEventListener("mousemove",(event)=>{
-    cursor.x = event.clientX/sizes.width-.5;
-    cursor.y = event.clientY/sizes.height-.5;
-})
+// window.addEventListener("mousemove",(event)=>{
+//     cursor.x = event.clientX/sizes.width-.5;
+//     cursor.y = event.clientY/sizes.height-.5;
+// })
 
 
 
@@ -40,7 +40,9 @@ function main() {
   const canvas = document.querySelector("canvas#gl");
   // Initialize the GL context
   const gl = canvas.getContext("webgl");
-
+  resizeCanvasToDisplaySize(gl.canvas);
+ 
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   // Only continue if WebGL is available and working
   if (gl === null) {
     alert(
@@ -77,6 +79,7 @@ function main() {
         "uProjectionMatrix"
       ),
       modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+      controlMatrix: gl.getUniformLocation(shaderProgram, "uControlMatrix"),
     },
   };
 
