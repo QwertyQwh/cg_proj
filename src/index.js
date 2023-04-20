@@ -1,72 +1,91 @@
 import './style.css'
 import vert from './shaders/vert'
 import frag from './shaders/frag'
-import { initShaderProgram,resizeCanvasToDisplaySize } from './utils'
-import { initBuffers } from './cube'
+import { initShaderProgram,ResizeCanvas } from './utils'
+import { initBuffers } from './cube_s'
 import { drawScene } from './drawscene'
-let cubeRotation = 0.0;
+import { max,min } from 'mathjs'
+
+const PI = 3.1415926
 let deltaTime = 0
-
-/**
- * Base
- */
-// Canvas
-const canvas = document.querySelector('canvas.gl')
-// Sizes
-const sizes = {
-    width: 800,
-    height: 600
+const accumulated = {theta:0,alpha:0};
+const cursorAnchor = {x:0,y:0};
+const diff = {alpha:0,theta:0};
+let isDown = false;
+const windowSize = {x:window.innerWidth,y:window.innerHeight}
+let parameters = {
+  isOrtho: false,
+  cameraTheta: 0,
+  cameraAlpha:0,
+  cameraRaiuds :3,
+  radius: 3
 }
 
-const cursor = {
-    x :0,
-    y:0
+function SubsribeToEvents(){
+  // Mouse Events
+  window.addEventListener('resize', function(event){
+    windowSize.x = window.innerWidth
+    windowSize.y = window.innerHeight
+  });
+  window.addEventListener("mouseup",(event)=>{
+    isDown = false
+    accumulated.alpha += diff.alpha
+    accumulated.theta += diff.theta
+    accumulated.theta = max(min(accumulated.theta,PI/2),-PI/2)
+    diff.alpha = 0
+    diff.theta = 0
+  })
+  window.addEventListener('mousedown',(event)=>{
+    event.preventDefault();
+    cursorAnchor.x = event.clientX/windowSize.x
+    cursorAnchor.y = event.clientY/windowSize.y
+    isDown = true;
+  })
+  window.addEventListener('mousemove',(event)=>{
+    event.preventDefault();
+    if(isDown){
+      diff.alpha = (event.clientX/windowSize.x-cursorAnchor.x)*2
+      diff.theta = (event.clientY/windowSize.y-cursorAnchor.y)*2
+    }
+  })
+  window.addEventListener("wheel", event => {
+    event.preventDefault()
+    const delta = Math.sign(event.deltaY);
+    if(parameters.radius+delta >0){
+      parameters.radius += delta
+    }
+  },{passive:false});
 }
-
-// window.addEventListener("mousemove",(event)=>{
-//     cursor.x = event.clientX/sizes.width-.5;
-//     cursor.y = event.clientY/sizes.height-.5;
-// })
-
-
-
-// tick()
-
-
 
 
 
 function main() {
+  SubsribeToEvents()
   const canvas = document.querySelector("canvas#gl");
-  // Initialize the GL context
+  const button = document.querySelector("button#renderMode");
+  button.onclick = (val)=>{
+    parameters.isOrtho = !parameters.isOrtho
+    button.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
+  }
+  button.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
+
   const gl = canvas.getContext("webgl");
-  resizeCanvasToDisplaySize(gl.canvas);
- 
+  // This is to prevent pixel size mismatch
+  ResizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  // Only continue if WebGL is available and working
+  // Support check
   if (gl === null) {
     alert(
-      "Unable to initialize WebGL. Your browser or machine may not support it."
+      "WebGL not supported."
     );
     return;
   }
-
-  // Set clear color to black, fully opaque
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  // Clear the color buffer with specified clear color
+  //Background Color
+  gl.clearColor(1.0, 0.0, 1.0, 1.0);
+  //Clear with the color above.
   gl.clear(gl.COLOR_BUFFER_BIT);
-
-  // Vertex shader program
-
-
-  // Initialize a shader program; this is where all the lighting
-  // for the vertices and so forth is established.
+  // Call some utility function to initialize the program
   const shaderProgram = initShaderProgram(gl, vert, frag);
-
-  // Collect all the info needed to use the shader program.
-  // Look up which attributes our shader program is using
-  // for aVertexPosition, aVertexColor and also
-  // look up uniform locations.
   const programInfo = {
     program: shaderProgram,
     attribLocations: {
@@ -83,21 +102,16 @@ function main() {
     },
   };
 
-  // Here's where we call the routine that builds all the
-  // objects we'll be drawing.
+
   const buffers = initBuffers(gl);
-
   let then = 0;
-
-  // Draw the scene repeatedly
   function render(now) {
-    now *= 0.001; // convert to seconds
+    now *= 0.001; 
     deltaTime = now - then;
     then = now;
-
-    drawScene(gl, programInfo, buffers, cubeRotation);
-    cubeRotation += deltaTime;
-
+    parameters.cameraTheta = max(min(accumulated.theta+diff.theta,PI/2),-PI/2)
+    parameters.cameraAlpha = accumulated.alpha+diff.alpha
+    drawScene(gl, programInfo, buffers, parameters);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

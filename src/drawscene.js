@@ -1,76 +1,29 @@
 import { mat4 } from "gl-matrix";
-import { cos,max,sin,min } from "mathjs";
-const PI = 3.1415926
-// const MAX_THETA = PI/2
-// const MAX_THETA = -PI/2
-const accumulated = {theta:0,alpha:0};
-const cursorAnchor = {x:0,y:0};
-const diff = {alpha:0,theta:0};
-let isDown = false;
-let radius = 1
-const windowSize = {x:window.innerWidth,y:window.innerHeight}
-window.addEventListener("wheel", event => {
-  const delta = Math.sign(event.deltaY);
-  if(radius+delta >0){
-    radius += delta
-  }
-  
-});
-window.addEventListener('resize', function(event){
-  windowSize.x = window.innerWidth
-  windowSize.y = window.innerHeight
-});
-window.addEventListener("mouseup",(event)=>{
-  isDown = false
-  accumulated.alpha += diff.alpha
-  accumulated.theta += diff.theta
-  accumulated.theta = max(min(accumulated.theta,PI/2),-PI/2)
-  diff.alpha = 0
-  diff.theta = 0
-})
-window.addEventListener('mousedown',(event)=>{
-  event.preventDefault();
-  cursorAnchor.x = event.clientX/windowSize.x
-  cursorAnchor.y = event.clientY/windowSize.y
-  isDown = true;
-})
-window.addEventListener('mousemove',(event)=>{
-  event.preventDefault();
-  if(isDown){
-    diff.alpha = (event.clientX/windowSize.x-cursorAnchor.x)*2
-    diff.theta = (event.clientY/windowSize.y-cursorAnchor.y)*2
-  }
-})
+import { cos,sin } from "mathjs";
 
-function drawScene(gl, programInfo, buffers, cubeRotation) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
-    gl.clearDepth(1.0); // Clear everything
+
+function drawScene(gl, programInfo, buffers, parameters) {
+
+
+    gl.clearColor(0.961, 0.792, 0.765, 1.0); 
+    gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
-  
     // Clear the canvas before we start drawing on it.
-  
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
-    // Create a perspective matrix, a special matrix that is
-    // used to simulate the distortion of perspective in a camera.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
-  
-    const fieldOfView = (45 * Math.PI) / 180; // in radians
+    const fieldOfView = 0.25* Math.PI; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
     const projectionMatrix = mat4.create();
-  
-    // note: glmatrix.js always has the first argument
-    // as the destination to receive the result.
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-  
-    // Set the drawing position to the "identity" point, which is
-    // the center of the scene.
+    const bound = 5
+    if(!parameters.isOrtho){
+      mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    }else{
+      mat4.ortho(projectionMatrix, -bound*aspect , bound*aspect,-bound,bound,zNear,zFar)
+    }
+
     const modelViewMatrix = mat4.create();
   
     // Now move the drawing position a bit to where we want to
@@ -102,11 +55,10 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
     
 
     const controlMatrix = mat4.create();
-    const cameraTheta = max(min(accumulated.theta+diff.theta,PI/2),-PI/2)
-    const cameraAlpha = accumulated.alpha+diff.alpha
+
     mat4.lookAt(
       controlMatrix,
-      [radius*cos(cameraTheta)*sin(cameraAlpha),radius*sin(cameraTheta),-radius*cos(cameraTheta)*cos(cameraAlpha)],
+      [parameters.radius*cos(parameters.cameraTheta)*sin(parameters.cameraAlpha),parameters.radius*sin(parameters.cameraTheta),-parameters.radius*cos(parameters.cameraTheta)*cos(parameters.cameraAlpha)],
       [0,0,0],
       [0,1,0]
       )
@@ -114,8 +66,7 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
     setPositionAttribute(gl, buffers, programInfo);
-  
-    setColorAttribute(gl, buffers, programInfo);
+    // setColorAttribute(gl, buffers, programInfo);
   
     // Tell WebGL which indices to use to index the vertices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
@@ -144,9 +95,9 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
       const type = gl.UNSIGNED_SHORT;
       const offset = 0;
       gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-    }
-  }
   
+    }
+  } 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
   function setPositionAttribute(gl, buffers, programInfo) {
