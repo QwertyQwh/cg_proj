@@ -5,14 +5,15 @@ function loadShader(gl, type, source) {
   gl.compileShader(shader);
   // Check status
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error("Shader compilation failed.")
+    var compilationLog = gl.getShaderInfoLog(shader);
+    console.error('Shader compiler log: ' + compilationLog);
     gl.deleteShader(shader);
     return null;
   }
   return shader
 }
 
-function initShaderProgram(gl, vsSource, fsSource) {
+function InitShaderProgram(gl, vsSource, fsSource) {
     // Create a vertex shader
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
     // Create a fragment shader
@@ -24,6 +25,8 @@ function initShaderProgram(gl, vsSource, fsSource) {
     gl.linkProgram(shaderProgram);
     return shaderProgram;
 }
+
+
 
 function ResizeCanvas(canvas) {
     const displayWidth  = canvas.clientWidth;
@@ -37,4 +40,4 @@ function ResizeCanvas(canvas) {
     return needResize;
 }
 
-export  {initShaderProgram,ResizeCanvas}
+export  {InitShaderProgram ,ResizeCanvas}

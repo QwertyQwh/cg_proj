@@ -121,7 +121,6 @@ function initBuffers(gl) {
       22,
       23, // left
     ];
-  
     // Now send the element array to GL
   
     gl.bufferData(

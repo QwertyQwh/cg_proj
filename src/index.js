@@ -1,24 +1,39 @@
 import './style.css'
 import vert from './shaders/vert'
-import frag from './shaders/frag'
-import { initShaderProgram,ResizeCanvas } from './utils'
-import { initBuffers } from './cube_s'
+import frag_matcap from './shaders/frag_matcap'
+import frag_wire from './shaders/frag_wire'
+import {ResizeCanvas } from './utils'
+import { initBuffers } from './geometry'
 import { drawScene } from './drawscene'
 import { max,min } from 'mathjs'
+import {InitPrograms, GenerateProgramInfo} from './programs'
+import metal_matcap from './assets/textures/metal_matcap.jpg'
+import { loadTexture } from './textureLoder'
 
 const PI = 3.1415926
-let deltaTime = 0
-const accumulated = {theta:0,alpha:0};
+const accumulated = {theta:0,alpha:PI};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
+const renderModes = ["wire","matcap"]
+let curRenderMode = 0
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
   isOrtho: false,
   cameraTheta: 0,
-  cameraAlpha:0,
+  cameraAlpha:PI,
   cameraRaiuds :3,
-  radius: 3
+  radius: 3,
+  floor: 0,
+}
+const vsSource = {
+  wire: vert,
+  matcap: vert,
+}
+
+const fsSource = {
+  wire: frag_wire,
+  matcap: frag_matcap
 }
 
 function SubsribeToEvents(){
@@ -60,19 +75,23 @@ function SubsribeToEvents(){
 
 
 function main() {
+  //HTML stuff
   SubsribeToEvents()
   const canvas = document.querySelector("canvas#gl");
-  const button = document.querySelector("button#renderMode");
-  button.onclick = (val)=>{
+  const renderBtn = document.querySelector("button#renderMode");
+  const shaderBtn = document.querySelector("button#shaderMode");
+  renderBtn.onclick = (val)=>{
     parameters.isOrtho = !parameters.isOrtho
-    button.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
+    renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
   }
-  button.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
+  shaderBtn.onclick = (val)=>{
+    curRenderMode = (++curRenderMode)%renderModes.length
+    shaderBtn.textContent = renderModes[curRenderMode];
+  }
+  renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
+  shaderBtn.textContent = renderModes[curRenderMode];
 
   const gl = canvas.getContext("webgl");
-  // This is to prevent pixel size mismatch
-  ResizeCanvas(gl.canvas);
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   // Support check
   if (gl === null) {
     alert(
@@ -80,38 +99,39 @@ function main() {
     );
     return;
   }
-  //Background Color
-  gl.clearColor(1.0, 0.0, 1.0, 1.0);
-  //Clear with the color above.
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  // This is to prevent pixel size mismatch
+  ResizeCanvas(gl.canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  // Load textures
+  const texture = loadTexture(gl, metal_matcap);
+  // Flip image pixels into the bottom-to-top order that WebGL expects.
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
   // Call some utility function to initialize the program
-  const shaderProgram = initShaderProgram(gl, vert, frag);
-  const programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
-      vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(
-        shaderProgram,
-        "uProjectionMatrix"
-      ),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
-      controlMatrix: gl.getUniformLocation(shaderProgram, "uControlMatrix"),
-    },
-  };
-
-
+  const programs = InitPrograms(gl,vsSource,fsSource)
+  const programInfos = GenerateProgramInfo(gl,programs)
   const buffers = initBuffers(gl);
+
+
+  // Tell WebGL we want to affect texture unit 0
+  gl.activeTexture(gl.TEXTURE0);
+  // Bind the texture to texture unit 0
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  // Tell the shader we bound the texture to texture unit 0
+  gl.uniform1i(programInfos.matcap.uniformLocations.uMatSampler, 0);
+
   let then = 0;
+  let deltaTime = 0
+  let renderMode;
   function render(now) {
     now *= 0.001; 
     deltaTime = now - then;
     then = now;
     parameters.cameraTheta = max(min(accumulated.theta+diff.theta,PI/2),-PI/2)
     parameters.cameraAlpha = accumulated.alpha+diff.alpha
-    drawScene(gl, programInfo, buffers, parameters);
+    renderMode = renderModes[curRenderMode]
+    drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
