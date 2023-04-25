@@ -14,12 +14,14 @@ function GenerateProgramInfo(gl, programs){
         program: wireProgram,
         attribLocations: {
           vertexPosition: gl.getAttribLocation(wireProgram, "aVertexPosition"),
-          vertexColor: gl.getAttribLocation(wireProgram, "aVertexColor"),
+            vertexNormal: gl.getAttribLocation(wireProgram, "aVertexNormal"),
         },
         uniformLocations: {
           projectionMatrix: gl.getUniformLocation(wireProgram,"uProjectionMatrix"),
           modelViewMatrix: gl.getUniformLocation(wireProgram, "uModelViewMatrix"),
           controlMatrix: gl.getUniformLocation(wireProgram, "uControlMatrix"),
+          backgroundColor: gl.getUniformLocation(wireProgram,"uBackground"),
+          uCameraPos: gl.getUniformLocation(wireProgram, "uCameraPos"),
         },
       };
       const matcapProgram = programs.matcap
@@ -27,7 +29,7 @@ function GenerateProgramInfo(gl, programs){
           program: matcapProgram,
           attribLocations: {
             vertexPosition: gl.getAttribLocation(matcapProgram, "aVertexPosition"),
-            vertexColor: gl.getAttribLocation(matcapProgram, "aVertexColor"),
+            vertexNormal: gl.getAttribLocation(matcapProgram, "aVertexNormal"),
           },
           uniformLocations: {
             projectionMatrix: gl.getUniformLocation(matcapProgram,"uProjectionMatrix"),
@@ -38,6 +40,12 @@ function GenerateProgramInfo(gl, programs){
             fogHeight: gl.getUniformLocation(matcapProgram,"uFogHeight"),
             uMatSampler: gl.getUniformLocation(matcapProgram, "uMatSampler"),
             uCameraPos: gl.getUniformLocation(matcapProgram, "uCameraPos"),
+            uLightDirTop: gl.getUniformLocation(matcapProgram, "uLightDirTop"),
+            uLightColorTop: gl.getUniformLocation(matcapProgram, "uLightColorTop"),
+            uLightDirLeft: gl.getUniformLocation(matcapProgram, "uLightDirLeft"),
+            uLightColorLeft: gl.getUniformLocation(matcapProgram, "uLightColorLeft"),
+            uLightDirRight: gl.getUniformLocation(matcapProgram, "uLightDirRight"),
+            uLightColorRight: gl.getUniformLocation(matcapProgram, "uLightColorRight"),
           },
         };
         return {

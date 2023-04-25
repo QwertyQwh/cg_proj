@@ -37,6 +37,11 @@ module.exports = {
         test: /\.(mp4|webm)$/,
         type: 'asset/resource',
        },
+       //Importing obj as plain text, only for this project where we do manual imports
+       {
+        test: /\.(obj)$/,
+        type: 'asset/source',
+       },
        {
         test: /\.svg$/,
         use: [{loader:'@svgr/webpack',

@@ -1,26 +1,19 @@
-import { mat4,vec4 } from "gl-matrix";
+import { mat4,vec4,vec3 } from "gl-matrix";
 import { cos,sin } from "mathjs";
-import {palette} from "./palette";
+import { GetCameraMatrix } from "./camera";
 
 function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
-    gl.clearColor(palette.background[0], palette.background[1], palette.background[2], 1.0);
+    gl.clearColor(parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    const fieldOfView = 0.25* Math.PI; // in radians
-    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    const zNear = 0.1;
-    const zFar = 100.0;
-    const projectionMatrix = mat4.create();
+    const buffer = buffers[parameters.model]
     const bound = 8
-    if(!parameters.isOrtho){
-      mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-    }else{
-      mat4.ortho(projectionMatrix, -bound*aspect , bound*aspect,-bound,bound,zNear,zFar)
-    }
+    const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,bound);
+
 
     const modelViewMatrix = mat4.create();
     const controlMatrix = mat4.create();
@@ -34,11 +27,9 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
-    setPositionAttribute(gl, buffers, programInfo);
-
-    // Tell WebGL which indices to use to index the vertices
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-
+    setPositionAttribute(gl, buffer, programInfo);
+    setNormalAttribute(gl,buffer,programInfo);
+    
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
 
@@ -58,18 +49,24 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
       false,
       controlMatrix
     );
-    const vertexCount = buffers.vertexCount;
     const type = gl.UNSIGNED_SHORT;
     const offset = 0;
+    const background = vec4.create()
+    vec4.set(background,parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0)
+    gl.uniform4fv(
+      programInfo.uniformLocations.backgroundColor,
+      background
+    );
+    const camera = vec3.create()
+    vec3.set(camera, cameraPos[0],cameraPos[1],cameraPos[2])
+    vec3.normalize(camera,camera);
+    gl.uniform3fv(
+      programInfo.uniformLocations.uCameraPos,
+      camera
+    )
     // matcap only stuff
     switch(shaderMode){
       case 'matcap':
-        const background = vec4.create()
-        vec4.set(background,palette.background[0], palette.background[1], palette.background[2], 1.0)
-        gl.uniform4fv(
-          programInfo.uniformLocations.backgroundColor,
-          background
-        );
         gl.uniform1f(
           programInfo.uniformLocations.fogStart,
           0,
@@ -78,18 +75,40 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
           programInfo.uniformLocations.fogHeight,
           5,
         )
+
         gl.uniform3f(
-          programInfo.uniformLocations.uCameraPos,
-          cameraPos[0],cameraPos[1],cameraPos[2]
+          programInfo.uniformLocations.uLightDirTop,
+          parameters.lights.top.direction[0],parameters.lights.top.direction[1],parameters.lights.top.direction[2]
         )
-        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+        gl.uniform4f(
+          programInfo.uniformLocations.uLightColorTop,
+          parameters.lights.top.color[0],parameters.lights.top.color[1],parameters.lights.top.color[2],1.
+        )
+        gl.uniform3f(
+          programInfo.uniformLocations.uLightDirLeft,
+          parameters.lights.left.direction[0],parameters.lights.left.direction[1],parameters.lights.left.direction[2]
+        )
+        gl.uniform4f(
+          programInfo.uniformLocations.uLightColorLeft,
+          parameters.lights.left.color[0],parameters.lights.left.color[1],parameters.lights.left.color[2],1.
+        )
+        gl.uniform3f(
+          programInfo.uniformLocations.uLightDirRight,
+          parameters.lights.right.direction[0],parameters.lights.right.direction[1],parameters.lights.right.direction[2]
+        )
+        gl.uniform4f(
+          programInfo.uniformLocations.uLightColorRight,
+          parameters.lights.right.color[0],parameters.lights.right.color[1],parameters.lights.right.color[2],1.
+        )
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+
+        gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
         break;
       case 'wire':
-        gl.drawElements(gl.LINE_STRIP, vertexCount, type, offset);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);
+        gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
         break;
     }
-
-    //TODO: need to way to compute thiss
 
   }
 
@@ -114,25 +133,26 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
   }
 
-  // Tell WebGL how to pull out the colors from the color buffer
-  // into the vertexColor attribute.
-  function setColorAttribute(gl, buffers, programInfo) {
-    const numComponents = 4;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+  function setNormalAttribute(gl, buffers, programInfo) {
+    const numComponents = 3;
+    const type = gl.FLOAT; 
+    const normalize = false; 
+    const stride = 0; 
+    const offset = 0; 
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normals);
     gl.vertexAttribPointer(
-      programInfo.attribLocations.vertexColor,
+      programInfo.attribLocations.vertexNormal,
       numComponents,
       type,
       normalize,
       stride,
       offset
     );
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexColor);
+    gl.enableVertexAttribArray(programInfo.attribLocations.vertexNormal);
   }
+
+
+
 
   function setTextureAttribute(gl, buffers, programInfo) {
     const num = 2; // every coordinate composed of 2 values

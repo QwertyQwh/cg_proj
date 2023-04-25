@@ -24,10 +24,26 @@ canvas {
    right: 50px;
     top:10px;
   }  
+
+  #colorMode{
+    position: absolute;
+    width: 100px;
+    height: 20px;
+   right: 50px;
+    top:90px;
+  }  
+
   #shaderMode{
     position: absolute;
     width: 100px;
     height: 20px;
-   right: 200px;
-    top:10px;
+   right: 50px;
+    top: 50px;
+  }
+  #modelMode{
+    position: absolute;
+    width: 100px;
+    height: 20px;
+   right: 50px;
+    top: 130px;
   }

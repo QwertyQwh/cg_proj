@@ -40,4 +40,8 @@ function ResizeCanvas(canvas) {
     return needResize;
 }
 
-export  {InitShaderProgram ,ResizeCanvas}
+function Interpolate(x,y,ratio){
+  return x*ratio+y*(1-ratio)
+}
+
+export  {InitShaderProgram ,ResizeCanvas,Interpolate}
