@@ -11,6 +11,7 @@ import test_matcap from './assets/textures/test_matcap.png'
 import { loadTexture } from './textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
+import { Maze } from './maze'
 
 const PI = 3.1415926
 const accumulated = {theta:PI/4,alpha:PI,radius:20};
@@ -116,6 +117,18 @@ function main() {
   //HTML stuff
   SubsribeToEvents()
   InitUI()
+
+  const mazeP = {
+    weights:{horizontal: 1. },
+   hollowCondition: null,
+   width:4,
+   height:4,
+   start:{i:0,j:0},
+   end:null
+}
+  const maze = new Maze(mazeP)
+  console.log(maze.nodes)
+
   const canvas = document.querySelector("canvas#gl");
   const gl = canvas.getContext("webgl");
   // Support check
