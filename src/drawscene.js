@@ -11,7 +11,7 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     const buffer = buffers[parameters.model]
-    const bound = 8
+    const bound = 12
     const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,bound);
 
 
@@ -49,7 +49,7 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
       false,
       controlMatrix
     );
-    const type = gl.UNSIGNED_SHORT;
+    const type = gl.UNSIGNED_INT;
     const offset = 0;
     const background = vec4.create()
     vec4.set(background,parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0)
@@ -73,7 +73,7 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
         )
         gl.uniform1f(
           programInfo.uniformLocations.fogHeight,
-          5,
+          1.5,
         )
 
         gl.uniform3f(
@@ -101,7 +101,6 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
           parameters.lights.right.color[0],parameters.lights.right.color[1],parameters.lights.right.color[2],1.
         )
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
-
         gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
         break;
       case 'wire':
@@ -109,7 +108,6 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
         gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
         break;
     }
-
   }
 
   // Tell WebGL how to pull out the positions from the position

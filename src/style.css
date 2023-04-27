@@ -47,3 +47,10 @@ canvas {
    right: 50px;
     top: 130px;
   }
+  #regenerate{
+    position: absolute;
+    width: 100px;
+    height: 20px;
+   right: 50px;
+    top: 170px;
+  }

@@ -20,9 +20,6 @@ class Node {
         right:null,//+x
         forward: null,//-z
         backward : null,//+z
-        //TODO: implement this
-        upward: null, // This is not a boolean value since we can move into arbitrary tiles 
-        downward: null, // This is not a boolean value since we can move into arbitrary tiles 
       } 
     }
     #ChooseAvailableChild(){
@@ -33,8 +30,8 @@ class Node {
       const backwardAvail = this.children.backward && !this.children.backward.visited
       // console.log(leftAvail,rightAvail,forwardAvail,backwardAvail)
       if(!leftAvail && !rightAvail && !forwardAvail && !backwardAvail){
-               //Return null if all children are visited
-               return null
+          //Return null if all children are visited
+          return null
       }
       const dice = Math.random()
         if((!forwardAvail && !backwardAvail) || dice<weights.horizontal){
@@ -90,25 +87,95 @@ class Node {
           if(!next){
             break;
           }
-          console.log(next.indices)
+          // console.log(next.indices)
           next.Visit()
         }
     }
-  }
-
-
-class Maze{
-  constructor({weights,hollowCondition, width, height, start, end}){
+    PostVisit(prev,prevDir,isStart){
+      let count = 0
+      const leftAvail = this.path.left && prevDir != "left"
+      const rightAvail = this.path.right &&  prevDir != "right"
+      const forwardAvail = this.path.forward &&  prevDir != "forward"
+      const backwardAvail = this.path.backward &&  prevDir != "backward"
+      Object.values(this.path).forEach(element => {
+        if(element){
+          count ++
+        }
+      });
+      if(isStart){
+        this.indices.h = 0
+      }else if(count!=2){
+        this.indices.h = prev.indices.h
+      }else{
+        let elevate = 0
+        if(Math.random()<this.maze.weights.stair){
+          let outPath = null
+          Object.entries(this.path).forEach((val)=>{
+            if(val[0]!=prevDir && val[1]){
+              outPath = val[0]
+            }
+          })
+          switch (outPath) {
+            case "left":
+              elevate = this.TowardsCenter(-1,0)
+              break;
+            case "right":
+              elevate = this.TowardsCenter(1,0)
+              break;    
+            case "forward":
+              elevate = this.TowardsCenter(0,1)
+              break;    
+            case "backward":
+              elevate = this.TowardsCenter(0,-1)
+              break;        
+            default:
+              break;
+            }
+            if(elevate == 0){
+              elevate = Math.random()>.5? 1:-1
+            }
+          }
+            this.indices.h = Math.max(prev.indices.h+elevate,0)
+          }
+          if(leftAvail){
+            this.children.left.PostVisit(this,"right")
+          }
+          if(rightAvail){
+            this.children.right.PostVisit(this,"left")
+          }
+          if(forwardAvail){
+            this.children.forward.PostVisit(this,"backward")
+          }
+          if(backwardAvail){
+            this.children.backward.PostVisit(this,"forward")
+          }
+        }
+        TowardsCenter(iDir, jDir){
+          const iTowardsCenter = (this.maze.centerLocation.i-this.indices.i)*iDir
+          const jTowardsCenter = (this.maze.centerLocation.j-this.indices.j)*jDir
+          if(iTowardsCenter>0 || jTowardsCenter>0){
+            return 1;
+          }
+          if(iTowardsCenter<0 || jTowardsCenter<0){
+            return -1;
+          }
+          return 0;
+        }
+      }
+              
+              
+  class Maze{
+   constructor({weights,hollowCondition, width, height, start, end, centerLocation}){
     this.weights = weights;
     this.hollowCondition = hollowCondition;
     this.start;
     this.end;
+    this.centerLocation = centerLocation
     this.nodes = Array(width)
-
     for(let i = 0; i<width; i++){
       this.nodes[i] = []
       for(let j = 0; j<height; j++){
-        const node = new Node({x:i,z:j},null,this)
+        const node = new Node({i:i,j:j,h:0},null,this)
         this.nodes[i].push(node)
     }
     }
@@ -121,7 +188,10 @@ class Maze{
       }
     }
     this.nodes[start.i][start.j].Visit()
+    this.nodes[start.i][start.j].PostVisit(null,null,true)
   }
+
+
 }
 
 export {Maze}

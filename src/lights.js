@@ -4,11 +4,11 @@ const lights = {
         color: null,
     },
     left:{
-        direction: [-0.7071,0,0.7071 ],
+        direction: [1,0,0 ],
         color: null,
     },
     right:{
-        direction: [0.7071,0,-0.7071],
+        direction: [0,0,1],
         color: null
     }
 }

@@ -2,7 +2,7 @@ import { mat4 } from "gl-matrix";
 
 const fieldOfView = 0.25* Math.PI; // in radians
 const zNear = 0.1;
-const zFar = 100.0;
+const zFar = 500.0;
 const projectionMatrix = mat4.create();
 
 function GetCameraMatrix(gl,isOrtho,bound){

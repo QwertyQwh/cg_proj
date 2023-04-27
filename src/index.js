@@ -11,13 +11,11 @@ import test_matcap from './assets/textures/test_matcap.png'
 import { loadTexture } from './textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
-import { Maze } from './maze'
 
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:PI,radius:20};
+const accumulated = {theta:PI/4,alpha:3*PI/4,radius:20};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
-const trailingAngles = {theta:PI/4,alpha:PI};
 let isDown = false;
 const renderModes = ["wire","matcap"]
 const modelModes = ['maze', 'modelFlat','modelSmooth']
@@ -29,7 +27,7 @@ const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
   isOrtho: false,
   cameraTheta: PI/4,
-  cameraAlpha:PI,
+  cameraAlpha:3*PI/4,
   cameraRaiuds :3,
   radius: 20,
   floor: 0,
@@ -108,7 +106,6 @@ function InitUI(){
   renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
   shaderBtn.textContent = renderModes[curRenderMode];
   modelBtn.textContent = modelModes[curModelMode]
-  
   colorBtn.textContent = "Color";
 }
 
@@ -118,16 +115,8 @@ function main() {
   SubsribeToEvents()
   InitUI()
 
-  const mazeP = {
-    weights:{horizontal: 1. },
-   hollowCondition: null,
-   width:4,
-   height:4,
-   start:{i:0,j:0},
-   end:null
-}
-  const maze = new Maze(mazeP)
-  console.log(maze.nodes)
+
+
 
   const canvas = document.querySelector("canvas#gl");
   const gl = canvas.getContext("webgl");
@@ -139,6 +128,7 @@ function main() {
   // This is to prevent pixel size mismatch
   ResizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  const ext = gl.getExtension("OES_element_index_uint");
 
   // Load textures
   const texture = loadTexture(gl, test_matcap);
