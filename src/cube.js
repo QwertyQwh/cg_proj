@@ -1,3 +1,14 @@
+function AddCube(positions,normals,indices,wires,info, params){
+  const {positions: pos,normals: norm, indices: ind,wires:wir} = InitCubeArrays(params)
+  const startingIndex = positions.length/3
+  positions.push(...pos)
+  normals.push(...norm)
+  indices.push(...ind.map((val,ind)=>val+startingIndex))
+  wires.push(...wir.map((val,ind)=>val+startingIndex))
+  info.vertexCount += 36
+  info.wireCount += 36
+}
+
 function InitCubeArrays(params){
     const positionArr = initPosition(params);
     const normalArr = initNormal(params)
@@ -137,4 +148,4 @@ function initPosition(params) {
     return wireIndices
   }
 
-  export {InitCubeArrays}
+  export {AddCube}

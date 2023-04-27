@@ -13,6 +13,7 @@ class Node {
           backward : null,//+z
         }
       }
+      this.from = null // This is used for stair generation
       this.visited = false
       this.maze = maze
       this.path = {
@@ -109,6 +110,7 @@ class Node {
       }else{
         let elevate = 0
         if(Math.random()<this.maze.weights.stair){
+          this.from = prevDir
           let outPath = null
           Object.entries(this.path).forEach((val)=>{
             if(val[0]!=prevDir && val[1]){
@@ -117,16 +119,16 @@ class Node {
           })
           switch (outPath) {
             case "left":
-              elevate = this.TowardsCenter(-1,0)
+              elevate = this.#TowardsCenter(-1,0)
               break;
             case "right":
-              elevate = this.TowardsCenter(1,0)
+              elevate = this.#TowardsCenter(1,0)
               break;    
             case "forward":
-              elevate = this.TowardsCenter(0,1)
+              elevate = this.#TowardsCenter(0,1)
               break;    
             case "backward":
-              elevate = this.TowardsCenter(0,-1)
+              elevate = this.#TowardsCenter(0,-1)
               break;        
             default:
               break;
@@ -150,7 +152,7 @@ class Node {
             this.children.backward.PostVisit(this,"forward")
           }
         }
-        TowardsCenter(iDir, jDir){
+        #TowardsCenter(iDir, jDir){
           const iTowardsCenter = (this.maze.centerLocation.i-this.indices.i)*iDir
           const jTowardsCenter = (this.maze.centerLocation.j-this.indices.j)*jDir
           if(iTowardsCenter>0 || jTowardsCenter>0){

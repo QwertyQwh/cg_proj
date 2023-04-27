@@ -13,7 +13,7 @@ import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:3*PI/4,radius:20};
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:20};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -27,7 +27,7 @@ const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
   isOrtho: false,
   cameraTheta: PI/4,
-  cameraAlpha:3*PI/4,
+  cameraAlpha:-1*PI/4,
   cameraRaiuds :3,
   radius: 20,
   floor: 0,

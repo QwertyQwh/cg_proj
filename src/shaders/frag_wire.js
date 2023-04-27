@@ -1,5 +1,4 @@
 const frag = /*glsl*/ `
-// fragment shader
 varying lowp vec3 vNormal;
 uniform lowp vec3 uCameraPos;
 uniform lowp vec4 uBackground;

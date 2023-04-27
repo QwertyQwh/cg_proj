@@ -23,7 +23,17 @@ uniform vec4 uLightColorRight;
 // }
 
 void main(void) {
-  gl_FragColor = max(dot(uLightDirLeft,vNormal),0.)*uLightColorLeft+max(dot(-uLightDirLeft,vNormal),0.)*uLightColorLeft+max(dot(-uLightDirRight,vNormal),0.)*uLightColorRight+max(dot(uLightDirRight,vNormal),0.)*uLightColorRight + max(dot(-uLightDirTop,vNormal),0.)*uLightColorTop;
+  vec3 normal = normalize(vNormal);
+  float leftStr = max(dot(uLightDirLeft,normal),0.);
+  //For visual purposes, diminish the light a little if it receives both lights' contributions.
+  leftStr *= leftStr;
+  float rightStr = max(dot(-uLightDirLeft,normal),0.);
+  rightStr *= rightStr;
+  float backwardStr = max(dot(-uLightDirRight,normal),0.);
+  backwardStr *= backwardStr;
+  float forwardStr = max(dot(uLightDirRight,normal),0.);
+  forwardStr *= forwardStr;
+  gl_FragColor = leftStr*uLightColorLeft + rightStr*uLightColorLeft + backwardStr*uLightColorRight + forwardStr*uLightColorRight + max(dot(-uLightDirTop,normal),0.)*uLightColorTop;
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
   // gl_FragColor = vec4(vNormal.xyz,1.);
   float factor = (vPosition.y-uFogStart)/uFogHeight;
