@@ -1,4 +1,4 @@
-function AddCube(positions,normals,indices,wires,info, params){
+function AddCube(positions,normals,indices,wires,info, params,flipZ = false,zAvg = 0){
   const {positions: pos,normals: norm, indices: ind,wires:wir} = InitCubeArrays(params)
   const startingIndex = positions.length/3
   positions.push(...pos)

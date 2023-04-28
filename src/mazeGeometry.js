@@ -78,6 +78,9 @@ import { AddSandwich } from "./sandwich";
     }
   }
 
+
+
+  //Totalling 16 stair cases
   function AddStair_backward_left_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
     let curHeight = (baseHeight+heightModifier* (node.indices.h-1))*size;
     const  cubeParam = {
@@ -182,7 +185,7 @@ import { AddSandwich } from "./sandwich";
     }
   }
 
-  function AddStair_backward_right_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+  function AddStair_backward_right_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info,flipZ = false){
     let curHeight = (baseHeight+heightModifier* (node.indices.h-1))*size;
     const leftBound = node.indices.i-width/2;
     const nearBound = node.indices.j-height/2;
@@ -236,10 +239,12 @@ import { AddSandwich } from "./sandwich";
     }
   }
 
-  function AddStair_backward_right_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+  function AddStair_backward_right_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info,flipZ = false){
     let curHeight = (baseHeight+heightModifier* node.indices.h)*size;
     const leftBound = node.indices.i-width/2;
     const nearBound = node.indices.j-height/2;
+    const xAvg = (leftBound+.5)*size
+    const zAvg = (nearBound+.5)*size
     const  cubeParam = {
       left: (leftBound+gap)*size,
       bottom:  0,
@@ -249,7 +254,7 @@ import { AddSandwich } from "./sandwich";
       depth: (1/8)*size
     }
     for(let i = 0; i<2; i++){
-        AddCube(positions,normals,indices,wires,info,cubeParam)
+        AddCube(positions,normals,indices,wires,info,cubeParam,flipZ,zAvg)
         cubeParam.near+= size/8
         curHeight-= heightModifier*size/8
         cubeParam.height = curHeight
@@ -261,21 +266,21 @@ import { AddSandwich } from "./sandwich";
         low: 0,
         high: curHeight 
     } 
-    AddSandwich(positions,normals,indices,wires,info,sandwichParam)
+    AddSandwich(positions,normals,indices,wires,info,sandwichParam,flipZ,zAvg)
     curHeight-= heightModifier*size/8
     sandwichParam.third.z = (nearBound+1-gap)*size
     sandwichParam.high = curHeight
-    AddSandwich(positions,normals,indices,wires,info,sandwichParam)
+    AddSandwich(positions,normals,indices,wires,info,sandwichParam,flipZ,zAvg)
     curHeight-= heightModifier*size/8
     sandwichParam.second.x = sandwichParam.third.x
     sandwichParam.second.z = sandwichParam.third.z
     sandwichParam.third.x = (leftBound+0.5)*size
     sandwichParam.high = curHeight
-    AddSandwich(positions,normals,indices,wires,info,sandwichParam)
+    AddSandwich(positions,normals,indices,wires,info,sandwichParam,flipZ,zAvg)
     curHeight-= heightModifier*size/8
     sandwichParam.third.x =  (leftBound+1-gap)*size
     sandwichParam.high = curHeight
-    AddSandwich(positions,normals,indices,wires,info,sandwichParam)
+    AddSandwich(positions,normals,indices,wires,info,sandwichParam,flipZ,zAvg)
     curHeight-= heightModifier*size/8
     cubeParam.left = (leftBound+1-gap)*size
     cubeParam.near = (nearBound+gap)*size
@@ -283,14 +288,43 @@ import { AddSandwich } from "./sandwich";
     cubeParam.width = size/8
     cubeParam.height = curHeight
     for(let i = 0; i<2; i++){
-        AddCube(positions,normals,indices,wires,info,cubeParam)
+        AddCube(positions,normals,indices,wires,info,cubeParam,flipZ,zAvg)
         cubeParam.left+= size/8
         curHeight-= heightModifier*size/8
         cubeParam.height = curHeight
     }
   }
 
+  // Modifying existing ones
+  // Same function 
+  function AddStair_left_backward_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    node.indices.h ++;
+    AddStair_backward_left_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info)
+    node.indices.h --;
+  }
+
+  function AddStair_left_backward_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    node.indices.h --;
+    AddStair_backward_left_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info)
+    node.indices.h ++;
+  }
+
+  function AddStair_right_backward_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    node.indices.h ++;
+    AddStair_backward_right_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info)
+    node.indices.h --;
+  }
+
+  function AddStair_right_backward_ascending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    node.indices.h --;
+    AddStair_backward_right_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info)
+    node.indices.h ++;
+  }
+  // Flipping axis
+  function Addstair_upward_right_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    AddStair_backward_right_descending(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info,true)
+  }
 
   export {AddMazeBlock,AddStair_backward_forward_ascending,AddStair_backward_forward_descending,AddStair_backward_left_ascending, AddStair_backward_left_descending,
-    AddStair_backward_right_ascending,AddStair_backward_right_descending
+    AddStair_backward_right_ascending,AddStair_backward_right_descending,AddStair_left_backward_descending
 }

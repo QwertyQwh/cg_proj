@@ -1,7 +1,7 @@
 import { sqrt } from "mathjs";
 
 
-function AddSandwich(positions,normals,indices,wires,info, params){
+function AddSandwich(positions,normals,indices,wires,info, params,flipZ = false,zAvg = 0){
   const {positions: pos,normals: norm, indices: ind,wires:wir} = InitSandwichArrays(params)
   const startingIndex = positions.length/3
   positions.push(...pos)
