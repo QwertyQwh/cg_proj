@@ -1,7 +1,6 @@
 import { LoadModel } from "./objLoader";
 import { Maze } from "./maze";
-import { AddMazeBlock, AddStair_right_backward_ascending,AddStair_left_upward_ascending } from "./mazeGeometry";
-import { AddSandwich } from "./sandwich";
+import { AddMazeBlock } from "./mazeGeometry";
 
 function initMazeBuffers(gl) {
   const positionBuffer = gl.createBuffer();
@@ -22,8 +21,8 @@ function initMazeBuffers(gl) {
   let indices = []
   let wires = []
   const mazeP = {
-    weights:{horizontal: 0, stair: 0.1 },
-   hollowCondition: null,
+    weights:{horizontal: 0.5, stair: 0.4 },
+   hollowCondition: (i,j)=> ((i>=8&& i<=12 && j>=8 && j<=12) /*|| ((i>0 || j>0) && (i+j*2) %4 == 0) */),
    width:20,
    height:20,
    centerLocation:{i:10,j:10},

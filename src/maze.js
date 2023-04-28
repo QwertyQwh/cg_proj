@@ -3,6 +3,7 @@
 class Node {
     constructor(indices,children,maze) {
       this.indices = indices
+      this.hollow = false
       if(children){
         this.children = children
       }else{
@@ -176,6 +177,7 @@ class Node {
   class Maze{
    constructor({weights,hollowCondition, width, height, start, end, centerLocation}){
     this.weights = weights;
+    // A function in the form (i,j) =>{ture/false}
     this.hollowCondition = hollowCondition;
     this.start;
     this.end;
@@ -186,14 +188,17 @@ class Node {
       for(let j = 0; j<height; j++){
         const node = new Node({i:i,j:j,h:0},null,this)
         this.nodes[i].push(node)
+        if(this.hollowCondition(i,j)){
+          node.hollow = true
+        }
     }
     }
       for(let i = 0; i<width; i++){
       for(let j = 0; j<height; j++){
-        this.nodes[i][j].children.left = i-1>=0? this.nodes[i-1][j]:null
-        this.nodes[i][j].children.right = i+1<width? this.nodes[i+1][j]:null
-        this.nodes[i][j].children.backward = j-1>=0? this.nodes[i][j-1]:null
-        this.nodes[i][j].children.forward = j+1<height? this.nodes[i][j+1]:null
+        this.nodes[i][j].children.left = i-1>=0 && !this.hollowCondition(i-1,j)? this.nodes[i-1][j]:null
+        this.nodes[i][j].children.right = i+1<width&& !this.hollowCondition(i+1,j)? this.nodes[i+1][j]:null
+        this.nodes[i][j].children.backward = j-1>=0 && !this.hollowCondition(i,j-1)? this.nodes[i][j-1]:null
+        this.nodes[i][j].children.forward = j+1<height && !this.hollowCondition(i,j+1)? this.nodes[i][j+1]:null
       }
     }
     this.nodes[start.i][start.j].Visit()

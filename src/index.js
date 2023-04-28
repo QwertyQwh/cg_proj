@@ -89,6 +89,7 @@ function InitUI(){
   const shaderBtn = document.querySelector("button#shaderMode");
   const colorBtn = document.querySelector("button#colorMode");
   const modelBtn = document.querySelector("button#modelMode");
+  const regenerateBtn = document.querySelector("button#regenerate");
   renderBtn.onclick = (val)=>{
     parameters.isOrtho = !parameters.isOrtho
     renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
@@ -104,6 +105,9 @@ function InitUI(){
   modelBtn.onclick = (val) =>{
     curModelMode = (++curModelMode)%modelModes.length
     modelBtn.textContent = modelModes[curModelMode]
+  }
+  regenerateBtn.onclick = (val)=>{
+    location.reload()
   }
   renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
   shaderBtn.textContent = renderModes[curRenderMode];

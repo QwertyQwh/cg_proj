@@ -1,3 +1,5 @@
+
+
 function AddCube(positions,normals,indices,wires,info, params){
   const {positions: pos,normals: norm, indices: ind,wires:wir} = InitCubeArrays(params)
   const startingIndex = positions.length/3
