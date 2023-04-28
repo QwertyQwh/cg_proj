@@ -2,6 +2,9 @@ import { AddCube } from "./cube";
 import { AddSandwich } from "./sandwich";
 
   function AddMazeBlock(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    if(node.indices.h<0){
+      console.log('negative')
+    }
     if(!node.from){
       AddFlatGround(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info)
       return;

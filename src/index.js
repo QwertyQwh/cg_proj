@@ -25,9 +25,9 @@ let curPalette = GeneratePalette();
 let curLights = GenerateLights(curPalette)
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
-  isOrtho: false,
+  isOrtho: true,
   cameraTheta: PI/4,
-  cameraAlpha:2*PI/4,
+  cameraAlpha:4*PI/4,
   cameraRaiuds :3,
   radius: 200,
   floor: 0,

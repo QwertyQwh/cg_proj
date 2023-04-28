@@ -139,7 +139,12 @@ class Node {
               elevate = Math.random()>.5? 1:-1
             }
           }
-            this.indices.h = Math.max(prev.indices.h+elevate,0)
+          if(prev.indices.h+elevate<0){
+            this.from = null
+            this.indices.h = prev.indices.h
+          }else{
+            this.indices.h = prev.indices.h+elevate
+          }
           }
           if(leftAvail){
             this.children.left.PostVisit(this,"right")

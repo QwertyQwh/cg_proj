@@ -22,7 +22,7 @@ function initMazeBuffers(gl) {
   let indices = []
   let wires = []
   const mazeP = {
-    weights:{horizontal: 0.5, stair: 0.5 },
+    weights:{horizontal: 0, stair: 0.1 },
    hollowCondition: null,
    width:20,
    height:20,
@@ -31,6 +31,7 @@ function initMazeBuffers(gl) {
    end:null
   }
   const maze = new Maze(mazeP)
+  console.log(maze.nodes)
   // for()
   
   for(let i = 0; i<mazeP.width; i++){
