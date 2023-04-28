@@ -13,7 +13,7 @@ import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:20};
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:1.5,fogStart:0};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -27,13 +27,15 @@ const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
   isOrtho: false,
   cameraTheta: PI/4,
-  cameraAlpha:-1*PI/4,
+  cameraAlpha:2*PI/4,
   cameraRaiuds :3,
-  radius: 20,
+  radius: 200,
   floor: 0,
   palette: null,
   lights: null,
-  model: "maze"
+  model: "maze",
+  fogStart: 30,
+  fogHeight: 30,
 }
 
 const vsSource = {
@@ -156,11 +158,13 @@ function main() {
     now *= 0.001; 
     deltaTime = now - then;
     then = now;
-    parameters.cameraTheta =  Interpolate(parameters.cameraTheta ,max(min(accumulated.theta+diff.theta,PI/2)),0.95)
-    parameters.cameraAlpha = Interpolate(parameters.cameraAlpha, accumulated.alpha+diff.alpha,0.95);
-    parameters.radius = Interpolate(parameters.radius,accumulated.radius,0.95)
-    parameters.palette = curPalette
+    parameters.cameraTheta =  Interpolate(parameters.cameraTheta ,max(min(accumulated.theta+diff.theta,PI/2)),0.96)
+    parameters.cameraAlpha = Interpolate(parameters.cameraAlpha, accumulated.alpha+diff.alpha,0.96);
+    parameters.radius = Interpolate(parameters.radius,accumulated.radius,0.96)
+    parameters.fogHeight = Interpolate(parameters.fogHeight,accumulated.fogHeight,0.98)
+    parameters.fogStart = Interpolate(parameters.fogStart,accumulated.fogStart,0.98)
     parameters.lights = curLights
+    parameters.palette = curPalette
     renderMode = renderModes[curRenderMode]
     parameters.model = modelModes[curModelMode]
     drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode);

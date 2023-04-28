@@ -41,6 +41,9 @@ function ResizeCanvas(canvas) {
 }
 
 function Interpolate(x,y,ratio){
+  if(Math.abs(x-y)<0.01){
+    return x;
+  }
   return x*ratio+y*(1-ratio)
 }
 

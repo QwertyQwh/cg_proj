@@ -1,4 +1,4 @@
-function AddCube(positions,normals,indices,wires,info, params,flipZ = false,zAvg = 0){
+function AddCube(positions,normals,indices,wires,info, params){
   const {positions: pos,normals: norm, indices: ind,wires:wir} = InitCubeArrays(params)
   const startingIndex = positions.length/3
   positions.push(...pos)
@@ -23,12 +23,20 @@ function InitCubeArrays(params){
 }
 
 function initPosition(params) {
-    const left = params.left
-    const right = params.left+params.width
-    const bottom = params.bottom
-    const top = params.bottom+params.height
-    const near = params.near
-    const far = params.near+params.depth
+    let left = params.left
+    let right = params.left+params.width
+    let bottom = params.bottom
+    let top = params.bottom+params.height
+    let near = params.near
+    let far = params.near+params.depth
+    if(params.flipX){
+      // console.log('flipping')
+      left = 2*params.avgX-left
+      right = 2*params.avgX-right
+    }if(params.flipZ){
+      near = 2*params.avgZ - near
+      far = 2*params.avgZ - far
+    }
     const positions = [
       //Front
       left,bottom,near,

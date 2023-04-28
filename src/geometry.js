@@ -1,6 +1,6 @@
 import { LoadModel } from "./objLoader";
 import { Maze } from "./maze";
-import { AddMazeBlock, AddStair_backward_right_descending,AddStair_backward_left_ascending,AddStair_left_backward_descending } from "./mazeGeometry";
+import { AddMazeBlock, AddStair_right_backward_ascending,AddStair_left_upward_ascending } from "./mazeGeometry";
 import { AddSandwich } from "./sandwich";
 
 function initMazeBuffers(gl) {
@@ -35,7 +35,7 @@ function initMazeBuffers(gl) {
   
   for(let i = 0; i<mazeP.width; i++){
     for(let j = 0; j< mazeP.height; j++){
-      // AddMazeBlock(maze.nodes[i][j],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
+      AddMazeBlock(maze.nodes[i][j],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.5}, positions,normals,indices,wires,info)
     }
   }
   const sandwichParams = {
@@ -44,12 +44,17 @@ function initMazeBuffers(gl) {
     third: {x:1,z:0},
     low:0,
     high:5,
+    flipZ:true,
+    avgZ: 0.5,
   }
   // AddSandwich(positions,normals,indices,wires,info, sandwichParams)
   // AddStair_backward_forward_ascending(maze.nodes[0][0],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
   // AddStair_backward_forward_descending(maze.nodes[0][1],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  AddStair_backward_left_ascending(maze.nodes[0][0],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  AddStair_left_backward_descending(maze.nodes[0][0],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
+  // AddStair_backward_left_ascending(maze.nodes[10][10],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
+  // AddStair_backward_right_ascending(maze.nodes[10][10],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
+  // AddStair_left_upward_ascending(maze.nodes[10][10],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
+  // AddStair_right_backward_ascending(maze.nodes[10][11],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
+  // AddStair_left_upward_descending(maze.nodes[10][11],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
 
   //Bind buffers to arrays
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);

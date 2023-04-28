@@ -14,6 +14,7 @@ class Node {
         }
       }
       this.from = null // This is used for stair generation
+      this.to = null
       this.visited = false
       this.maze = maze
       this.path = {
@@ -117,6 +118,7 @@ class Node {
               outPath = val[0]
             }
           })
+          this.to = outPath
           switch (outPath) {
             case "left":
               elevate = this.#TowardsCenter(-1,0)

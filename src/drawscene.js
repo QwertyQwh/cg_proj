@@ -11,8 +11,7 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     const buffer = buffers[parameters.model]
-    const bound = 12
-    const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,bound);
+    const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,parameters.radius/2.0/1.4);
 
 
     const modelViewMatrix = mat4.create();
@@ -69,11 +68,11 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode) {
       case 'matcap':
         gl.uniform1f(
           programInfo.uniformLocations.fogStart,
-          0,
+          parameters.fogStart,
         )
         gl.uniform1f(
           programInfo.uniformLocations.fogHeight,
-          1.5,
+          parameters.fogHeight,
         )
 
         gl.uniform3f(
