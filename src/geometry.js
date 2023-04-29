@@ -1,7 +1,11 @@
 import { LoadModel } from "./objLoader";
 import { Maze } from "./maze";
 import { AddMazeBlock } from "./mazeGeometry";
-
+import { AddModel } from "./model";
+import cone from './assets/models/cone.obj'
+import suzanne from './assets/models/suzanne.obj'
+import { settings } from "./settings";
+import { AddTowers } from "./towers";
 function initMazeBuffers(gl) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
@@ -20,42 +24,23 @@ function initMazeBuffers(gl) {
   let normals = []
   let indices = []
   let wires = []
-  const mazeP = {
-    weights:{horizontal: 0.5, stair: 0.4 },
-   hollowCondition: (i,j)=> ((i>=8&& i<=12 && j>=8 && j<=12) /*|| ((i>0 || j>0) && (i+j*2) %4 == 0) */),
-   width:20,
-   height:20,
-   centerLocation:{i:10,j:10},
-   start:{i:0,j:0},
-   end:null
-  }
+  const mazeP = settings.mazeParams
   const maze = new Maze(mazeP)
-  console.log(maze.nodes)
-  // for()
-  
+  const blockParam = settings.blockParams
   for(let i = 0; i<mazeP.width; i++){
     for(let j = 0; j< mazeP.height; j++){
-      AddMazeBlock(maze.nodes[i][j],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.5}, positions,normals,indices,wires,info)
+      AddMazeBlock(maze.nodes[i][j],{...blockParam,width:mazeP.width,height:mazeP.height}, positions,normals,indices,wires,info)
     }
   }
-  const sandwichParams = {
-    first: {x:0,z:0},
-    second: {x:0,z:1},
-    third: {x:1,z:0},
-    low:0,
-    high:5,
-    flipZ:true,
-    avgZ: 0.5,
-  }
-  // AddSandwich(positions,normals,indices,wires,info, sandwichParams)
-  // AddStair_backward_forward_ascending(maze.nodes[0][0],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  // AddStair_backward_forward_descending(maze.nodes[0][1],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  // AddStair_backward_left_ascending(maze.nodes[10][10],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  // AddStair_backward_right_ascending(maze.nodes[10][10],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  // AddStair_left_upward_ascending(maze.nodes[10][10],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  // AddStair_right_backward_ascending(maze.nodes[10][11],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-  // AddStair_left_upward_descending(maze.nodes[10][11],{width:mazeP.width,height:mazeP.height,size:1,gap:0.25,baseHeight:2,heightModifier:0.7}, positions,normals,indices,wires,info)
-
+  const towerParams = {
+    count:20,
+    mazeDepth: mazeP.height*blockParam.size,
+    mazeWidth: mazeP.width*blockParam.size,
+    bound: 2*mazeP.height*blockParam.size,
+    height: 7
+   }
+  AddTowers(positions,normals,indices,wires,info,towerParams)
+  // AddModel(positions,normals,indices,wires,info,{file:cone,smoothen:false,offsetY: 5})
   //Bind buffers to arrays
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -67,7 +52,6 @@ function initMazeBuffers(gl) {
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(wires),gl.STATIC_DRAW);
   return info;
 }
-
 
 
 
@@ -83,7 +67,7 @@ function initModelBuffers(gl,smoothen) {
     wireIndices: indexWireBuffer,
     vertexCount: 0,
     }
-    const params = LoadModel(smoothen);
+    const params = LoadModel({file:suzanne,smoothen:smoothen,offsetY:5});
     let positions = params.vertices;
     let normals = params.elementsNormal
     let indices = params.elements

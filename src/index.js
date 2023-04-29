@@ -1,5 +1,6 @@
 import './style.css'
-import vert from './shaders/vert'
+import vert_static from './shaders/vert_static'
+import vert_flag from './shaders/vert_flag'
 import frag_matcap from './shaders/frag_matcap'
 import frag_wire from './shaders/frag_wire'
 import {Interpolate, ResizeCanvas } from './utils'
@@ -11,9 +12,10 @@ import test_matcap from './assets/textures/test_matcap.png'
 import { loadTexture } from './textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
+import { settings } from './settings'
 
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:1.5,fogStart:0};
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -29,23 +31,25 @@ let parameters = {
   cameraTheta: PI/4,
   cameraAlpha:4*PI/4,
   cameraRaiuds :3,
-  radius: 200,
+  radius: 300,
   floor: 0,
   palette: null,
   lights: null,
   model: "maze",
-  fogStart: 30,
-  fogHeight: 30,
+  fogStart: 20,
+  fogHeight: 20,
 }
 
 const vsSource = {
-  wire: vert,
-  matcap: vert,
+  wire: vert_static,
+  matcap: vert_static,
+  flag: vert_flag
 }
 
 const fsSource = {
   wire: frag_wire,
-  matcap: frag_matcap
+  matcap: frag_matcap,
+  flag:frag_matcap
 }
 
 function SubsribeToEvents(){
@@ -58,7 +62,7 @@ function SubsribeToEvents(){
     isDown = false
     accumulated.alpha += diff.alpha
     accumulated.theta += diff.theta
-    accumulated.theta = max(min(accumulated.theta,PI/2),0)
+    accumulated.theta = max(min(accumulated.theta,settings.controls.maxTheta),settings.controls.minTheta)
     diff.alpha = 0
     diff.theta = 0
   })
@@ -78,7 +82,7 @@ function SubsribeToEvents(){
   window.addEventListener("wheel", event => {
     event.preventDefault()
     const delta = Math.sign(event.deltaY);
-    if(accumulated.radius+delta >0){
+    if(accumulated.radius+delta > settings.controls.minRadius && accumulated.radius+delta<settings.controls.maxRadius){
       accumulated.radius += delta
     }
   },{passive:false});
@@ -120,10 +124,6 @@ function main() {
   //HTML stuff
   SubsribeToEvents()
   InitUI()
-
-
-
-
   const canvas = document.querySelector("canvas#gl");
   const gl = canvas.getContext("webgl");
   // Support check
@@ -162,7 +162,7 @@ function main() {
     now *= 0.001; 
     deltaTime = now - then;
     then = now;
-    parameters.cameraTheta =  Interpolate(parameters.cameraTheta ,max(min(accumulated.theta+diff.theta,PI/2)),0.96)
+    parameters.cameraTheta =  Interpolate(parameters.cameraTheta ,max(min(accumulated.theta+diff.theta,settings.controls.maxTheta)),0.96)
     parameters.cameraAlpha = Interpolate(parameters.cameraAlpha, accumulated.alpha+diff.alpha,0.96);
     parameters.radius = Interpolate(parameters.radius,accumulated.radius,0.96)
     parameters.fogHeight = Interpolate(parameters.fogHeight,accumulated.fogHeight,0.98)

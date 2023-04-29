@@ -1,6 +1,6 @@
 import { AddCube } from "./cube";
 import { AddSandwich } from "./sandwich";
-
+const padding = 0.005
   function AddMazeBlock(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
     if(node.hollow){
       return;

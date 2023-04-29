@@ -2,9 +2,11 @@ import { InitShaderProgram } from "./utils"
 function InitPrograms(gl,  vsSources, fsSources){
     const wire = InitShaderProgram(gl,vsSources.wire, fsSources.wire)
     const matcap = InitShaderProgram(gl,vsSources.matcap, fsSources.matcap)
+    const flag = InitShaderProgram(gl,vsSources.flag, fsSources.flag)
     return {
         wire:wire,
         matcap: matcap,
+        flag: flag
     }
 }
 
@@ -48,9 +50,34 @@ function GenerateProgramInfo(gl, programs){
             uLightColorRight: gl.getUniformLocation(matcapProgram, "uLightColorRight"),
           },
         };
+        const flagProgram = programs.flag
+        const flagInfo = {
+            program: flagProgram,
+            attribLocations: {
+              vertexPosition: gl.getAttribLocation(flagProgram, "aVertexPosition"),
+              vertexNormal: gl.getAttribLocation(flagProgram, "aVertexNormal"),
+            },
+            uniformLocations: {
+              projectionMatrix: gl.getUniformLocation(flagProgram,"uProjectionMatrix"),
+              modelViewMatrix: gl.getUniformLocation(flagProgram, "uModelViewMatrix"),
+              controlMatrix: gl.getUniformLocation(flagProgram, "uControlMatrix"),
+              backgroundColor: gl.getUniformLocation(flagProgram,"uBackground"),
+              fogStart: gl.getUniformLocation(flagProgram,"uFogStart"),
+              fogHeight: gl.getUniformLocation(flagProgram,"uFogHeight"),
+              uMatSampler: gl.getUniformLocation(flagProgram, "uMatSampler"),
+              uCameraPos: gl.getUniformLocation(flagProgram, "uCameraPos"),
+              uLightDirTop: gl.getUniformLocation(flagProgram, "uLightDirTop"),
+              uLightColorTop: gl.getUniformLocation(flagProgram, "uLightColorTop"),
+              uLightDirLeft: gl.getUniformLocation(flagProgram, "uLightDirLeft"),
+              uLightColorLeft: gl.getUniformLocation(flagProgram, "uLightColorLeft"),
+              uLightDirRight: gl.getUniformLocation(flagProgram, "uLightDirRight"),
+              uLightColorRight: gl.getUniformLocation(flagProgram, "uLightColorRight"),
+            },
+          };
         return {
             wire:wireInfo,
             matcap: matcapInfo,
+            flag: flagInfo
         }
 }
 

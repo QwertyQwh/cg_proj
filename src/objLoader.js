@@ -1,8 +1,8 @@
-    import suzanne from './assets/models/suzanne.obj'
 
 
     // A very minimal parser for a single object model
-    const Parse = (src,smoothen)=>{
+    const Parse = (src,smoothen,offsetX,offsetY,offsetZ)=>{
+        
         const vertices_orig = [];
         const vertices = []
         const normals = []
@@ -18,7 +18,7 @@
                     normals.push([nums[1],nums[2],nums[3]])
                 }else{
                     const nums = line.split(" ")
-                    vertices_orig.push([parseFloat(nums[1]),parseFloat(nums[2])+2,parseFloat(nums[3])])
+                    vertices_orig.push([parseFloat(nums[1])+offsetX,parseFloat(nums[2])+offsetY,parseFloat(nums[3])+offsetZ])
                 }
             }else if(line[0] == 'f'){
                 const nums = line.split(" ")
@@ -77,5 +77,5 @@
         return {vertices, elements,elementsNormal,elementsWire}
     }
 
-    const LoadModel  =  (smoothen) =>Parse(suzanne,smoothen)
+    const LoadModel  =  ({file,smoothen,offsetX,offsetY,offsetZ}) =>Parse(file,smoothen??false,offsetX??0,offsetY??0,offsetZ??0)
     export {LoadModel}
