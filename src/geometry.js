@@ -34,8 +34,8 @@ function initMazeBuffers(gl) {
   }
   const towerParams = {
     count:20,
-    mazeDepth: mazeP.height*blockParam.size,
-    mazeWidth: mazeP.width*blockParam.size,
+    mazeDepth: (mazeP.height+1)*blockParam.size,
+    mazeWidth: (mazeP.width+1)*blockParam.size,
     bound: 2*mazeP.height*blockParam.size,
     height: 7
    }

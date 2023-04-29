@@ -8,12 +8,11 @@ import { random } from 'mathjs'
 function AddTowers(positions,normals,indices,wires,info,{count,mazeWidth,mazeDepth,bound,height}){
     const sampleParams = {
         bound:bound,
-        min: bound*0.5,
+        min: bound*0.3,
         max: bound*0.8,
         attempts: 20,
         count: count
     }
-    console.log(sampleParams)
     const points = PoissonSample(sampleParams)
     
     points.forEach((val)=>{

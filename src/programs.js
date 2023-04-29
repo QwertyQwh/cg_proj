@@ -75,9 +75,8 @@ function GenerateProgramInfo(gl, programs){
             },
           };
         return {
-            wire:wireInfo,
-            matcap: matcapInfo,
-            flag: flagInfo
+            wire: [wireInfo],
+            matcap: [matcapInfo,flagInfo],
         }
 }
 

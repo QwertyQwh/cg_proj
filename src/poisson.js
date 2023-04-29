@@ -4,9 +4,7 @@ import { distance, pi, random,cos, sin } from "mathjs"
 function PoissonSample(params){
     const obtained = [[0,0]]
     const queue = [[0,0]]
-    let count = 0
     while(obtained.length<params.count && queue.length > 0 ){
-        console.log(++count)
         const newP = SampleFromPoint(queue[0],params,obtained);
         if(newP){
             obtained.push(newP)

@@ -147,20 +147,25 @@ function main() {
 
 
   // Tell WebGL we want to affect texture unit 0
-  gl.activeTexture(gl.TEXTURE0);
-  // Bind the texture to texture unit 0
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  // Tell the shader we bound the texture to texture unit 0
-  gl.uniform1i(programInfos.matcap.uniformLocations.uMatSampler, 0);
+  // gl.activeTexture(gl.TEXTURE0);
+  // // Bind the texture to texture unit 0
+  // gl.bindTexture(gl.TEXTURE_2D, texture);
+  // // Tell the shader we bound the texture to texture unit 0
+  // gl.uniform1i(programInfos.matcap.uniformLocations.uMatSampler, 0);
 
   
 
   let then = 0;
+  let elapse = 0;
+  let start;
   let deltaTime = 0
   let renderMode;
   function render(now) {
     now *= 0.001; 
-    deltaTime = now - then;
+    if(!start){
+      start = now
+    }
+    elapse = now-start;
     then = now;
     parameters.cameraTheta =  Interpolate(parameters.cameraTheta ,max(min(accumulated.theta+diff.theta,settings.controls.maxTheta)),0.96)
     parameters.cameraAlpha = Interpolate(parameters.cameraAlpha, accumulated.alpha+diff.alpha,0.96);
@@ -171,7 +176,7 @@ function main() {
     parameters.palette = curPalette
     renderMode = renderModes[curRenderMode]
     parameters.model = modelModes[curModelMode]
-    drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode);
+    drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
