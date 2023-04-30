@@ -1,8 +1,8 @@
 import { distance, pi, random,cos, sin } from "mathjs"
+const obtained = [[0,0]]
 
 // assume we start from 0,0 and generate sampling points in the sphere of radius bound around the origin.
 function PoissonSample(params){
-    const obtained = [[0,0]]
     const queue = [[0,0]]
     while(obtained.length<params.count && queue.length > 0 ){
         const newP = SampleFromPoint(queue[0],params,obtained);
@@ -14,6 +14,10 @@ function PoissonSample(params){
         }
     }
     return obtained
+}
+
+function GetCurrentSample(){
+    return obtained;
 }
 
 function SampleFromPoint(point, params,obtained ){
@@ -38,4 +42,4 @@ function SampleFromPoint(point, params,obtained ){
     return null;
 }
 
-export {PoissonSample}
+export {PoissonSample, GetCurrentSample}

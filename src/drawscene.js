@@ -26,12 +26,18 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode,elapse) {
       const camera = vec3.create()
     vec3.set(camera, cameraPos[0],cameraPos[1],cameraPos[2])
     vec3.normalize(camera,camera);
-    const transformMatrix = mat4.create()
+    const rotationMatrix = mat4.create()
     mat4.rotate(
-      transformMatrix,
-      transformMatrix,
-      pi*0.25,
+      rotationMatrix,
+      rotationMatrix,
+      pi*1.25,
       [0,1,0])
+    const translationMatrix = mat4.create()
+    mat4.translate(
+      translationMatrix,
+      translationMatrix,
+      [5,0,5]
+    )
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
     for(let i = 0; i<parameters.curGeometries.geometries.length; i++){
@@ -58,9 +64,14 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode,elapse) {
         controlMatrix
       );
       gl.uniformMatrix4fv(
-        programInfo.uniformLocations.transformMatrix,
+        programInfo.uniformLocations.rotationMatrix,
         false,
-        transformMatrix
+        rotationMatrix
+      );
+      gl.uniformMatrix4fv(
+        programInfo.uniformLocations.translationMatrix,
+        false,
+        translationMatrix
       );
       gl.uniform4fv(
         programInfo.uniformLocations.backgroundColor,

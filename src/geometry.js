@@ -7,6 +7,7 @@ import suzanne from './assets/models/suzanne.obj'
 import { settings } from "./settings";
 import { AddTowers } from "./geometries/towers";
 import { AddFlag } from "./geometries/flag";
+import { AddCloud } from "./geometries/cloud";
 function initMazeBuffers(gl) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
@@ -20,7 +21,7 @@ function initMazeBuffers(gl) {
     vertexCount: 0,
     wireCount: 0,
   }
-  
+
   let positions = []
   let normals = []
   let indices = []
@@ -42,7 +43,13 @@ function initMazeBuffers(gl) {
    }
   AddTowers(positions,normals,indices,wires,info,towerParams)
   // AddModel(positions,normals,indices,wires,info,{file:cone,smoothen:false,offsetY: 5})
-
+  const flagParams = {
+    offsetY:20,
+    offsetX:-15,
+    scale:.5,
+    smoothen: false
+  }
+  AddCloud(positions,normals,indices,wires,info,flagParams)
   //Bind buffers to arrays
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);

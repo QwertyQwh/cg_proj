@@ -8,7 +8,7 @@ import { initBuffers } from './geometry'
 import { drawScene } from './drawscene'
 import { max,min } from 'mathjs'
 import {InitPrograms, GenerateProgramInfo} from './utils/programs'
-import test_matcap from './assets/textures/test_matcap.png'
+import clouds from './assets/textures/clouds.png'
 import { loadTexture } from './utils/textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
@@ -152,23 +152,29 @@ function main() {
   ResizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   const ext = gl.getExtension("OES_element_index_uint");
-
-  // Load textures
-  const texture = loadTexture(gl, test_matcap);
-  // Flip image pixels into the bottom-to-top order that WebGL expects.
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   // Call some utility function to initialize the program
   const programs = InitPrograms(gl,vsSource,fsSource)
   const programInfos = GenerateProgramInfo(gl,programs)
   const buffers = initBuffers(gl);
 
 
+  // Load textures
+  const texture = loadTexture(gl, clouds,gl.RGBA);
+  console.log(texture)
+  // Flip image pixels into the bottom-to-top order that WebGL expects.
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
   // Tell WebGL we want to affect texture unit 0
-  // gl.activeTexture(gl.TEXTURE0);
-  // // Bind the texture to texture unit 0
-  // gl.bindTexture(gl.TEXTURE_2D, texture);
-  // // Tell the shader we bound the texture to texture unit 0
-  // gl.uniform1i(programInfos.matcap.uniformLocations.uMatSampler, 0);
+  gl.activeTexture(gl.TEXTURE0);
+  // Bind the texture to texture unit 0
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  // Tell the shader we bound the texture to texture unit 0
+  programInfos.matcap.forEach((val)=>{
+    gl.uniform1i(val.uniformLocations.uMatSampler, 0);
+  })
+  programInfos.wire.forEach((val)=>{
+    gl.uniform1i(val.uniformLocations.uMatSampler, 0);
+  })
 
   
 

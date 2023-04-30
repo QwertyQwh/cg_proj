@@ -13,7 +13,7 @@ uniform lowp vec3 uLightDirLeft;
 uniform vec4 uLightColorLeft;
 uniform vec3 uLightDirRight;
 uniform vec4 uLightColorRight;
-
+uniform float bound;
 // lowp vec2 project_to_matcap(lowp vec3 coord){
 //   lowp vec3 camera_z = uCameraPos;
 //   lowp float ac = sqrt(camera_z.x*camera_z.x+camera_z.z*camera_z.z);
@@ -34,6 +34,7 @@ void main(void) {
   float forwardStr = max(dot(uLightDirRight,normal),0.);
   forwardStr *= forwardStr;
   gl_FragColor = leftStr*uLightColorLeft + rightStr*uLightColorLeft + backwardStr*uLightColorRight + forwardStr*uLightColorRight + max(dot(-uLightDirTop,normal),0.)*uLightColorTop;
+  gl_FragColor = mix(gl_FragColor,uLightColorLeft,texture2D(uMatSampler, vec2(vPosition.x/40.+0.5,vPosition.z/40.+0.5)).x*.5);
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
   // gl_FragColor = vec4(vNormal.xyz,1.);
   float factor = (vPosition.y-uFogStart)/uFogHeight;
