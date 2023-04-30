@@ -1,11 +1,11 @@
-import { LoadModel } from "./objLoader";
-import { Maze } from "./maze";
-import { AddMazeBlock } from "./mazeGeometry";
-import { AddModel } from "./model";
+import { LoadModel } from "./geometries/objLoader";
+import { Maze } from "./geometries/maze";
+import { AddMazeBlock } from "./geometries/mazeGeometry";
+import { AddModel } from "./geometries/model";
 import cone from './assets/models/cone.obj'
 import suzanne from './assets/models/suzanne.obj'
 import { settings } from "./settings";
-import { AddTowers } from "./towers";
+import { AddTowers } from "./geometries/towers";
 function initMazeBuffers(gl) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();

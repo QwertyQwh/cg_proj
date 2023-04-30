@@ -1,5 +1,5 @@
-import tower from './assets/models/tower.obj'
-import { PoissonSample } from './poisson'
+import tower from '../assets/models/tower.obj'
+import { PoissonSample } from '../utils/poisson'
 import { AddModel } from './model'
 import { random } from 'mathjs'
 
