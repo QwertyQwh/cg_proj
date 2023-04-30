@@ -1,7 +1,7 @@
 
 
     // A very minimal parser for a single object model
-    const Parse = (src,smoothen,offsetX,offsetY,offsetZ)=>{
+    const Parse = (src,smoothen,offsetX,offsetY,offsetZ,scale)=>{
         
         const vertices_orig = [];
         const vertices = []
@@ -18,7 +18,7 @@
                     normals.push([nums[1],nums[2],nums[3]])
                 }else{
                     const nums = line.split(" ")
-                    vertices_orig.push([parseFloat(nums[1])+offsetX,parseFloat(nums[2])+offsetY,parseFloat(nums[3])+offsetZ])
+                    vertices_orig.push([parseFloat(nums[1])*scale+offsetX,parseFloat(nums[2])*scale+offsetY,parseFloat(nums[3])*scale+offsetZ])
                 }
             }else if(line[0] == 'f'){
                 const nums = line.split(" ")
@@ -77,5 +77,5 @@
         return {vertices, elements,elementsNormal,elementsWire}
     }
 
-    const LoadModel  =  ({file,smoothen,offsetX,offsetY,offsetZ}) =>Parse(file,smoothen??false,offsetX??0,offsetY??0,offsetZ??0)
+    const LoadModel  =  ({file,smoothen,offsetX,offsetY,offsetZ,scale}) =>Parse(file,smoothen??false,offsetX??0,offsetY??0,offsetZ??0,scale??1)
     export {LoadModel}

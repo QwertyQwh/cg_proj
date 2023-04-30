@@ -1,20 +1,20 @@
 import { mat4,vec4,vec3 } from "gl-matrix";
-import { cos,sin } from "mathjs";
+import { cos,pi,sin } from "mathjs";
 import { GetCameraMatrix } from "./camera";
 
-function drawScene(gl, programInfo, buffers, parameters, shaderMode,elapse) {
+function drawScene(gl, programInfos, buffers, parameters, shaderMode,elapse) {
     gl.clearColor(parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    const buffer = buffers[parameters.model]
     const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,parameters.radius/2.0/1.4);
-
-
-    const modelViewMatrix = mat4.create();
+    const type = gl.UNSIGNED_INT;
+    const offset = 0;
+    const background = vec4.create()
+      vec4.set(background,parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0)
+      const modelViewMatrix = mat4.create();
     const controlMatrix = mat4.create();
     const cameraPos = [parameters.radius*cos(parameters.cameraTheta)*sin(parameters.cameraAlpha),parameters.radius*sin(parameters.cameraTheta),-parameters.radius*cos(parameters.cameraTheta)*cos(parameters.cameraAlpha)]
     mat4.lookAt(
@@ -23,91 +23,105 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode,elapse) {
       [0,0,0],
       [0,1,0]
       )
-
-    // Tell WebGL how to pull out the positions from the position
-    // buffer into the vertexPosition attribute.
-    programInfo = programInfo[0]
-    setPositionAttribute(gl, buffer, programInfo);
-    setNormalAttribute(gl,buffer,programInfo);
-    
-    // Tell WebGL to use our program when drawing
-    gl.useProgram(programInfo.program);
-
-    // Set the shader uniforms
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix
-    );
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix
-    );
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.controlMatrix,
-      false,
-      controlMatrix
-    );
-    const type = gl.UNSIGNED_INT;
-    const offset = 0;
-    const background = vec4.create()
-    vec4.set(background,parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0)
-    gl.uniform4fv(
-      programInfo.uniformLocations.backgroundColor,
-      background
-    );
-    const camera = vec3.create()
+      const camera = vec3.create()
     vec3.set(camera, cameraPos[0],cameraPos[1],cameraPos[2])
     vec3.normalize(camera,camera);
-    gl.uniform3fv(
-      programInfo.uniformLocations.uCameraPos,
-      camera
-    )
-    // matcap only stuff
-    switch(shaderMode){
-      case 'matcap':
-        gl.uniform1f(
-          programInfo.uniformLocations.fogStart,
-          parameters.fogStart,
-        )
-        gl.uniform1f(
-          programInfo.uniformLocations.fogHeight,
-          parameters.fogHeight,
-        )
+    const transformMatrix = mat4.create()
+    mat4.rotate(
+      transformMatrix,
+      transformMatrix,
+      pi*0.25,
+      [0,1,0])
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    for(let i = 0; i<parameters.curGeometries.geometries.length; i++){
+      const programInfo = programInfos[parameters.curGeometries.programs[i]]
+      const buffer = buffers[parameters.curGeometries.geometries[i]]
+      setPositionAttribute(gl, buffer, programInfo);
+      setNormalAttribute(gl,buffer,programInfo);
+      // Tell WebGL to use our program when drawing
+      gl.useProgram(programInfo.program);
+      // Set the shader uniforms
+      gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix
+      );
+      gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix
+      );
+      gl.uniformMatrix4fv(
+        programInfo.uniformLocations.controlMatrix,
+        false,
+        controlMatrix
+      );
+      gl.uniformMatrix4fv(
+        programInfo.uniformLocations.transformMatrix,
+        false,
+        transformMatrix
+      );
+      gl.uniform4fv(
+        programInfo.uniformLocations.backgroundColor,
+        background
+      );
+  
+      gl.uniform3fv(
+        programInfo.uniformLocations.uCameraPos,
+        camera
+      )
+      gl.uniform1f(
+        programInfo.uniformLocations.uTime,
+        parameters.elapse
+      )
+      // matcap only stuff
+      switch(shaderMode){
+        case 'matcap':
+          gl.uniform1f(
+            programInfo.uniformLocations.fogStart,
+            parameters.fogStart,
+          )
+          gl.uniform1f(
+            programInfo.uniformLocations.fogHeight,
+            parameters.fogHeight,
+          )
+  
+          gl.uniform3f(
+            programInfo.uniformLocations.uLightDirTop,
+            parameters.lights.top.direction[0],parameters.lights.top.direction[1],parameters.lights.top.direction[2]
+          )
+          gl.uniform4f(
+            programInfo.uniformLocations.uLightColorTop,
+            parameters.lights.top.color[0],parameters.lights.top.color[1],parameters.lights.top.color[2],1.
+          )
+          gl.uniform3f(
+            programInfo.uniformLocations.uLightDirLeft,
+            parameters.lights.left.direction[0],parameters.lights.left.direction[1],parameters.lights.left.direction[2]
+          )
+          gl.uniform4f(
+            programInfo.uniformLocations.uLightColorLeft,
+            parameters.lights.left.color[0],parameters.lights.left.color[1],parameters.lights.left.color[2],1.
+          )
+          gl.uniform3f(
+            programInfo.uniformLocations.uLightDirRight,
+            parameters.lights.right.direction[0],parameters.lights.right.direction[1],parameters.lights.right.direction[2]
+          )
+          gl.uniform4f(
+            programInfo.uniformLocations.uLightColorRight,
+            parameters.lights.right.color[0],parameters.lights.right.color[1],parameters.lights.right.color[2],1.
+          )
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+          gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
+          break;
+        case 'wire':
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);
+          gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
+          break;
+      }
 
-        gl.uniform3f(
-          programInfo.uniformLocations.uLightDirTop,
-          parameters.lights.top.direction[0],parameters.lights.top.direction[1],parameters.lights.top.direction[2]
-        )
-        gl.uniform4f(
-          programInfo.uniformLocations.uLightColorTop,
-          parameters.lights.top.color[0],parameters.lights.top.color[1],parameters.lights.top.color[2],1.
-        )
-        gl.uniform3f(
-          programInfo.uniformLocations.uLightDirLeft,
-          parameters.lights.left.direction[0],parameters.lights.left.direction[1],parameters.lights.left.direction[2]
-        )
-        gl.uniform4f(
-          programInfo.uniformLocations.uLightColorLeft,
-          parameters.lights.left.color[0],parameters.lights.left.color[1],parameters.lights.left.color[2],1.
-        )
-        gl.uniform3f(
-          programInfo.uniformLocations.uLightDirRight,
-          parameters.lights.right.direction[0],parameters.lights.right.direction[1],parameters.lights.right.direction[2]
-        )
-        gl.uniform4f(
-          programInfo.uniformLocations.uLightColorRight,
-          parameters.lights.right.color[0],parameters.lights.right.color[1],parameters.lights.right.color[2],1.
-        )
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
-        gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
-        break;
-      case 'wire':
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);
-        gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
-        break;
     }
+ 
   }
 
   // Tell WebGL how to pull out the positions from the position
@@ -148,8 +162,6 @@ function drawScene(gl, programInfo, buffers, parameters, shaderMode,elapse) {
     );
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexNormal);
   }
-
-
 
 
   function setTextureAttribute(gl, buffers, programInfo) {

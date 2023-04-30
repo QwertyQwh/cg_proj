@@ -9,7 +9,7 @@ import { drawScene } from './drawscene'
 import { max,min } from 'mathjs'
 import {InitPrograms, GenerateProgramInfo} from './utils/programs'
 import test_matcap from './assets/textures/test_matcap.png'
-import { loadTexture } from './textureLoder'
+import { loadTexture } from './utils/textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 import { settings } from './settings'
@@ -20,9 +20,9 @@ const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
 const renderModes = ["wire","matcap"]
-const modelModes = ['maze', 'modelFlat','modelSmooth']
+const sceneModes = ['maze', 'modelFlat','modelSmooth']
 let curRenderMode = 1
-let curModelMode = 0
+let curSceneMode = 0
 let curPalette = GeneratePalette();
 let curLights = GenerateLights(curPalette)
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
@@ -38,18 +38,35 @@ let parameters = {
   model: "maze",
   fogStart: 20,
   fogHeight: 20,
+  elapse:0,
+  curGeometries: null
+}
+
+const sceneGeometries = {
+  maze:{
+    geometries: ["maze",'flag'],
+    instance : [1, 5],
+    parameters: [null, null],
+    programs: [0,1],
+  },
+  modelFlat:{
+    geometries: ['modelFlat'],
+    programs: [0],
+  },
+  modelSmooth:{
+    geometries: ['modelSmooth'],
+    programs: [0],
+  }
 }
 
 const vsSource = {
-  wire: vert_static,
-  matcap: vert_static,
+  static: vert_static,
   flag: vert_flag
 }
 
 const fsSource = {
   wire: frag_wire,
   matcap: frag_matcap,
-  flag:frag_matcap
 }
 
 function SubsribeToEvents(){
@@ -107,15 +124,15 @@ function InitUI(){
     curLights = GenerateLights(curPalette)
   }
   modelBtn.onclick = (val) =>{
-    curModelMode = (++curModelMode)%modelModes.length
-    modelBtn.textContent = modelModes[curModelMode]
+    curSceneMode = (++curSceneMode)%sceneModes.length
+    modelBtn.textContent = sceneModes[curSceneMode]
   }
   regenerateBtn.onclick = (val)=>{
     location.reload()
   }
   renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
   shaderBtn.textContent = renderModes[curRenderMode];
-  modelBtn.textContent = modelModes[curModelMode]
+  modelBtn.textContent = sceneModes[curSceneMode]
   colorBtn.textContent = "Color";
 }
 
@@ -174,8 +191,10 @@ function main() {
     parameters.fogStart = Interpolate(parameters.fogStart,accumulated.fogStart,0.98)
     parameters.lights = curLights
     parameters.palette = curPalette
+    parameters.elapse = elapse
     renderMode = renderModes[curRenderMode]
-    parameters.model = modelModes[curModelMode]
+    parameters.model = sceneModes[curSceneMode]
+    parameters.curGeometries = sceneGeometries[parameters.model]
     drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
     requestAnimationFrame(render);
   }
