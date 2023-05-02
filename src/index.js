@@ -5,18 +5,17 @@ import frag_matcap from './shaders/frag_matcap'
 import frag_wire from './shaders/frag_wire'
 import frag_white from './shaders/frag_white'
 import vert_cloud from './shaders/vert_cloud'
+import frag_floor from './shaders/frag_floor'
 import {Interpolate, ResizeCanvas } from './utils/utils'
 import { initBuffers } from './geometry'
 import { drawScene } from './drawscene'
 import { max,min } from 'mathjs'
 import {InitScenePrograms, GenerateSceneProgramInfo, InitCloudPrograms, GenerateCloudProgramInfo} from './utils/programs'
-import clouds from './assets/textures/clouds.png'
 import { loadTexture } from './utils/textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
-import { settings } from './settings'
+import { settings,Randomize } from './settings'
 import { GetCloudTexture, UpdateCloudTexture } from './cloudTexture'
-import { drawClouds } from './drawclouds'
 
 const PI = 3.1415926
 const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0};
@@ -46,13 +45,19 @@ let parameters = {
   curGeometries: null,
   translation: null,
   rotation: null,
+  characterPos: [0,0]
 }
 
 const sceneGeometries = {
   maze:{
-    geometries: ["maze",'flag','cloud'],
-    instance : [{}, {},{}], //for using instancing later
-    programs: [0,1,2],
+    geometries: ["maze",'flag','cloud','floor'],
+    instance : [
+    {translation: [0,0,0], scale: [1,1,1]}, 
+    {translation:[0,0,0],scale:[1,1,1]},
+    {translation:[0,0,0],scale:[1,1,1]},
+    {translation:[0,0,0],scale:[1,1,1]}
+    ], 
+    programs: [0,1,2,3],
   },
   modelFlat:{
     geometries: ['modelFlat'],
@@ -74,6 +79,7 @@ const fsSource = {
   wire: frag_wire,
   matcap: frag_matcap,
   white: frag_white,
+  floor: frag_floor
 }
 
 function SubsribeToEvents(){
@@ -145,6 +151,7 @@ function InitUI(){
 
 
 function main() {
+  Randomize()
   //HTML stuff
   SubsribeToEvents()
   InitUI()

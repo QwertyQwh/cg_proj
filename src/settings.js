@@ -1,11 +1,14 @@
-import { pi } from "mathjs"
+import { floor, pi, random } from "mathjs"
+
+const width = 20
+const height = 20
 
 const settings = {
     mazeParams:{
         weights:{horizontal: 0.5, stair: 0.4 },
-        hollowCondition: (i,j)=> ((i>=8&& i<=12 && j>=8 && j<=12) || ((i<2)&& (j<2))|| ((i<2)&& (j>17)) ||((i>17)&& (j>17)) ||((i>17)&& (j<2))   ),/*|| ((i>0 || j>0) && (i+j*2) %4 == 0) */
-        width:20,
-        height:20,
+        hollowCondition: (i,j)=> ((i>=width/2-2&& i<=width/2+2 && j>=height/2-2 && j<=height/2+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>width-3)) ||((i>width-3)&& (j>width-3)) ||((i>width-3)&& (j<2))   ),/*|| ((i>0 || j>0) && (i+j*2) %4 == 0) */
+        width:width,
+        height:height,
         centerLocation:{i:10,j:10},
         start:{i:0,j:2},
         end:null
@@ -28,4 +31,14 @@ const settings = {
         speed: -0.3,
     }
 }
-export {settings}
+
+
+function Randomize(){
+    settings.mazeParams.width = floor(random(10,31))
+    settings.mazeParams.height = floor(random(10,31))
+    settings.mazeParams.hollowCondition = (i,j)=> ((i>=settings.mazeParams.width /2-2&& i<=settings.mazeParams.width /2+2 && j>=settings.mazeParams.height/2-2 && j<=settings.mazeParams.height/2+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j<2)))
+    settings.blockParams.heightModifier = random(0.2,1.2)
+    settings.mazeParams.weights.horizontal = random(0.1,0.9)
+    settings.mazeParams.weights.stair = random(0.2,0.8)
+}
+export {settings,Randomize}

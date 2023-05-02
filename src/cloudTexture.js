@@ -1,7 +1,7 @@
 import { drawClouds } from "./drawclouds";
 
-    const targetTextureHeight = 1024;
-    const targetTextureWidth = 1024;
+    const targetTextureHeight = 4096;
+    const targetTextureWidth = 4096;
     let fb
 
 function GetCloudTexture(gl, programInfo, buffer, parameters){

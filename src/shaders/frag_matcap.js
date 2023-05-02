@@ -34,6 +34,9 @@ void main(void) {
   float forwardStr = max(dot(uLightDirRight,normal),0.);
   forwardStr *= forwardStr;
   gl_FragColor = leftStr*uLightColorLeft + rightStr*uLightColorLeft + backwardStr*uLightColorRight + forwardStr*uLightColorRight + max(dot(-uLightDirTop,normal),0.)*uLightColorTop;
+    float factor = (vPosition.y-uFogStart)/uFogHeight;
+  factor = clamp(factor, 0., 1.);
+  gl_FragColor = mix(uBackground, gl_FragColor, factor);
   vec2 shadowCoord = vec2(vPosition.x/100.+0.5,vPosition.z/100.+0.5);
   float shadow = 0. ;
   for (float i = -0.002; i < 0.003; i += 0.001){
@@ -42,16 +45,11 @@ void main(void) {
     }
   }
   shadow = shadow*0.04;
-  if(vPosition.y<15.){
-    gl_FragColor = mix(gl_FragColor,uLightColorLeft,shadow*.6);
+  if(vPosition.y<20.){
+    gl_FragColor = mix(gl_FragColor,uLightColorLeft*.7,shadow*.6);
   }
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
-  // gl_FragColor = vec4(vNormal.xyz,1.);
-  float factor = (vPosition.y-uFogStart)/uFogHeight;
-  factor = clamp(factor, 0., 1.);
-  // lowp vec2 texCoord = project_to_matcap(vNormal);
-  // gl_FragColor = texture2D(uMatSampler, texCoord);
-  gl_FragColor = mix(uBackground, gl_FragColor, factor);
+
 }
 `;
 export default frag 

@@ -1,4 +1,4 @@
-finish clouds
+support instancing?
 finish the castle
 Add little pavilion
 lookup fire shader

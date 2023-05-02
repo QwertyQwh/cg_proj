@@ -6,13 +6,17 @@ function InitScenePrograms(gl,  vsSources, fsSources){
     const flagMatcap = InitShaderProgram(gl,vsSources.flag, fsSources.matcap)
     const cloudWire = InitShaderProgram(gl,vsSources.cloud, fsSources.wire)
     const cloudMatcap = InitShaderProgram(gl,vsSources.cloud, fsSources.matcap)
+    const floorWire = InitShaderProgram(gl,vsSources.static,fsSources.wire)
+    const floorMatcap = InitShaderProgram(gl,vsSources.static,fsSources.floor)
     return {
         wire:wire,
         matcap: matcap,
         flagWire: flagWire,
         flagMatcap: flagMatcap,
         cloudWire: cloudWire,
-        cloudMatcap: cloudMatcap
+        cloudMatcap: cloudMatcap,
+        floorWire: floorWire,
+        floorMatcap: floorMatcap
     }
 }
 
@@ -68,6 +72,23 @@ function GenerateSceneProgramInfo(gl, programs){
               uTime: gl.getUniformLocation(cloudWireProgram,"uTime"),
             },
           };
+          const floorWireProgram = programs.floorWire
+          const floorWireInfo = {
+              program: floorWireProgram,
+              attribLocations: {
+                vertexPosition: gl.getAttribLocation(floorWireProgram, "aVertexPosition"),
+                  vertexNormal: gl.getAttribLocation(floorWireProgram, "aVertexNormal"),
+              },
+              uniformLocations: {
+                projectionMatrix: gl.getUniformLocation(floorWireProgram,"uProjectionMatrix"),
+                controlMatrix: gl.getUniformLocation(floorWireProgram, "uControlMatrix"),
+                translationMatrix: gl.getUniformLocation(floorWireProgram, "uTranslationMatrix"),
+                rotationMatrix: gl.getUniformLocation(floorWireProgram, "uRotationMatrix"),
+                backgroundColor: gl.getUniformLocation(floorWireProgram,"uBackground"),
+                uCameraPos: gl.getUniformLocation(floorWireProgram, "uCameraPos"),
+                uTime: gl.getUniformLocation(floorWireProgram,"uTime"),
+              },
+            };
       const matcapProgram = programs.matcap
       const matcapInfo = {
           program: matcapProgram,
@@ -146,9 +167,35 @@ function GenerateSceneProgramInfo(gl, programs){
                 uTime: gl.getUniformLocation(cloudMatcapProgram,"uTime"),
             },
             };
+            const floorMatcapProgram = programs.floorMatcap
+            const floorMatcapInfo = {
+                program: floorMatcapProgram,
+                attribLocations: {
+                  vertexPosition: gl.getAttribLocation(floorMatcapProgram, "aVertexPosition"),
+                  vertexNormal: gl.getAttribLocation(floorMatcapProgram, "aVertexNormal"),
+                },
+                uniformLocations: {
+                  projectionMatrix: gl.getUniformLocation(floorMatcapProgram,"uProjectionMatrix"),
+                  controlMatrix: gl.getUniformLocation(floorMatcapProgram, "uControlMatrix"),
+                  translationMatrix: gl.getUniformLocation(floorMatcapProgram, "uTranslationMatrix"),
+                  rotationMatrix: gl.getUniformLocation(floorMatcapProgram, "uRotationMatrix"),
+                  backgroundColor: gl.getUniformLocation(floorMatcapProgram,"uBackground"),
+                  fogStart: gl.getUniformLocation(floorMatcapProgram,"uFogStart"),
+                  fogHeight: gl.getUniformLocation(floorMatcapProgram,"uFogHeight"),
+                  uMatSampler: gl.getUniformLocation(floorMatcapProgram, "uMatSampler"),
+                  uCameraPos: gl.getUniformLocation(floorMatcapProgram, "uCameraPos"),
+                  uLightDirTop: gl.getUniformLocation(floorMatcapProgram, "uLightDirTop"),
+                  uLightColorTop: gl.getUniformLocation(floorMatcapProgram, "uLightColorTop"),
+                  uLightDirLeft: gl.getUniformLocation(floorMatcapProgram, "uLightDirLeft"),
+                  uLightColorLeft: gl.getUniformLocation(floorMatcapProgram, "uLightColorLeft"),
+                  uLightDirRight: gl.getUniformLocation(floorMatcapProgram, "uLightDirRight"),
+                  uLightColorRight: gl.getUniformLocation(floorMatcapProgram, "uLightColorRight"),
+                  uTime: gl.getUniformLocation(floorMatcapProgram,"uTime"),
+              },
+              };
         return {
-            wire: [wireInfo,flagWireInfo,cloudWireInfo],
-            matcap: [matcapInfo,flagMatcapInfo,cloudMatcapInfo],
+            wire: [wireInfo,flagWireInfo,cloudWireInfo,floorWireInfo],
+            matcap: [matcapInfo,flagMatcapInfo,cloudMatcapInfo,floorMatcapInfo],
         }
 }
 

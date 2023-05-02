@@ -1,3 +1,4 @@
+import { settings } from "../settings";
 function loadShader(gl, type, source) {
   const shader = gl.createShader(type);  
   gl.shaderSource(shader, source);
@@ -45,6 +46,12 @@ function Interpolate(x,y,ratio){
     return x;
   }
   return x*ratio+y*(1-ratio)
+}
+
+function maze2world(i,j){
+  const x = (i-settings.mazeParams.width*.5+.5)*settings.blockParams.size
+  const y = (j-settings.mazeParams.height*.5+.5)*settings.blockParams.size
+  return {x,y}
 }
 
 export  {InitShaderProgram ,ResizeCanvas,Interpolate}

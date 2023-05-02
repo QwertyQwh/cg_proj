@@ -1,12 +1,12 @@
 import { LoadModel } from "./geometries/objLoader";
 import { Maze } from "./geometries/maze";
 import { AddMazeBlock } from "./geometries/mazeGeometry";
-import { AddModel } from "./geometries/model";
 import suzanne from './assets/models/suzanne.obj'
 import { settings } from "./settings";
 import { AddTowers,AddTower } from "./geometries/towers";
 import { AddFlag } from "./geometries/flag";
 import { AddCloud } from "./geometries/cloud";
+import { AddCube } from "./geometries/cube";
 function initMazeBuffers(gl) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
@@ -69,8 +69,6 @@ function initMazeBuffers(gl) {
   return info;
 }
 
-
-
 function initModelBuffers(gl,smoothen) {
     const positionBuffer = gl.createBuffer();
     const normalBuffer = gl.createBuffer();
@@ -101,56 +99,83 @@ function initModelBuffers(gl,smoothen) {
     return info;
   }
 
+function initFlagBuffers(gl) {
+  const positionBuffer = gl.createBuffer();
+  const normalBuffer = gl.createBuffer();
+  const indexBuffer = gl.createBuffer();
+const indexWireBuffer = gl.createBuffer();
 
-  function initFlagBuffers(gl) {
-    const positionBuffer = gl.createBuffer();
-    const normalBuffer = gl.createBuffer();
-    const indexBuffer = gl.createBuffer();
-  const indexWireBuffer = gl.createBuffer();
-
-  let positions = [];
-  let normals = []
-  let indices = []
-  let wires = []
-  let info = {
-    position: positionBuffer,
-    normals: normalBuffer,
-    indices: indexBuffer,
-  wireIndices: indexWireBuffer,
-  vertexCount: 0,
-  }  
-  const flagParams = {
-    offsetY:10,
-    scale:.5,
-    smoothen: false
-  }
-  AddFlag(positions,normals,indices,wires,info,flagParams)
-    info.vertexCount = indices.length
-    info.wireCount = wires.length
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexWireBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(wires),gl.STATIC_DRAW);
-    return info;
-  }
-
-
-
-
-function initBuffers(gl){
-  const modelFlat = initModelBuffers(gl,false) 
-  const modelSmooth = initModelBuffers(gl,true)
-  const maze = initMazeBuffers(gl)
-  const flag = initFlagBuffers(gl)
-  const cloud = initCloudBuffers(gl)
-  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud};
+let positions = [];
+let normals = []
+let indices = []
+let wires = []
+let info = {
+  position: positionBuffer,
+  normals: normalBuffer,
+  indices: indexBuffer,
+wireIndices: indexWireBuffer,
+vertexCount: 0,
+}  
+const flagParams = {
+  offsetY:10,
+  scale:.5,
+  smoothen: false
+}
+AddFlag(positions,normals,indices,wires,info,flagParams)
+  info.vertexCount = indices.length
+  info.wireCount = wires.length
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexWireBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(wires),gl.STATIC_DRAW);
+  return info;
 }
 
+
+
+  
 function initCloudBuffers(gl) {
+  const positionBuffer = gl.createBuffer();
+  const normalBuffer = gl.createBuffer();
+  const indexBuffer = gl.createBuffer();
+const indexWireBuffer = gl.createBuffer();
+let info = {
+  position: positionBuffer,
+  normals: normalBuffer,
+  indices: indexBuffer,
+  wireIndices: indexWireBuffer,
+  vertexCount: 0,
+  wireCount: 0,
+}
+
+let positions = []
+let normals = []
+let indices = []
+let wires = []
+const cloudParams = {
+  offsetY:settings.cloud.height,
+  offsetX:5,
+  scale:.2,
+  smoothen: false
+}
+AddCloud(positions,normals,indices,wires,info,cloudParams)
+//Bind buffers to arrays
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexWireBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(wires),gl.STATIC_DRAW);
+return info;
+}
+
+function InitFloorBuffers(gl){
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
   const indexBuffer = gl.createBuffer();
@@ -168,13 +193,15 @@ function initCloudBuffers(gl) {
   let normals = []
   let indices = []
   let wires = []
-  const cloudParams = {
-    offsetY:settings.cloud.height,
-    offsetX:5,
-    scale:.2,
-    smoothen: false
+  const cubeParams = {
+    left: -settings.cloud.bound,
+    bottom:-2,
+    near:-settings.cloud.bound,
+    width: 2*settings.cloud.bound,
+    height:2,
+    depth:2*settings.cloud.bound
   }
-  AddCloud(positions,normals,indices,wires,info,cloudParams)
+  AddCube(positions,normals,indices,wires,info,cubeParams)
   //Bind buffers to arrays
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -187,6 +214,16 @@ function initCloudBuffers(gl) {
   return info;
 }
 
+function initBuffers(gl){
+  const modelFlat = initModelBuffers(gl,false) 
+  const modelSmooth = initModelBuffers(gl,true)
+  const maze = initMazeBuffers(gl)
+  const flag = initFlagBuffers(gl)
+  const cloud = initCloudBuffers(gl)
+  const floor = InitFloorBuffers(gl)
+  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud,floor: floor};
+}
 
 
-  export {initBuffers}
+
+export {initBuffers}

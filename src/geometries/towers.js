@@ -19,7 +19,7 @@ function AddTowers(positions,normals,indices,wires,info,{count,mazeWidth,mazeDep
         if(val[0]>-mazeWidth*.5&&val[0]<mazeWidth*.5&&val[1]>-mazeDepth*.5&& val[1]<mazeDepth*.5){
             return;
         }
-        const offsetY = height* random(0.3,1)
+        const offsetY = height* random(0,1)
         AddTower(positions,normals,indices,wires,info,{offsetX: val[0],offsetZ: val[1],offsetY:offsetY})
     })
 }
