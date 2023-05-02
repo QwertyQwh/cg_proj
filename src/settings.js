@@ -22,9 +22,10 @@ const settings = {
         minRadius: 0,
         maxRadius : 100,
     },
-    shadow:{
+    cloud:{
         bound:50,
         height:25., 
+        speed: -0.3,
     }
 }
 export {settings}

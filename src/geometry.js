@@ -169,7 +169,7 @@ function initCloudBuffers(gl) {
   let indices = []
   let wires = []
   const cloudParams = {
-    offsetY:settings.shadow.height,
+    offsetY:settings.cloud.height,
     offsetX:5,
     scale:.2,
     smoothen: false

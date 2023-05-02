@@ -1,6 +1,7 @@
 import { mat4,vec4,vec3 } from "gl-matrix";
 import { cos,pi,sin } from "mathjs";
 import { GetCameraMatrix } from "./camera";
+import { settings } from "./settings";
 
 function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -32,17 +33,28 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
       rotationMatrix,
       pi*1.25,
       [0,1,0])
-    const translationMatrix = mat4.create()
-    mat4.translate(
-      translationMatrix,
-      translationMatrix,
-      [5,0,5]
-    )
+
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
     for(let i = 0; i<parameters.curGeometries.geometries.length; i++){
       const programInfo = programInfos[parameters.curGeometries.programs[i]]
       const buffer = buffers[parameters.curGeometries.geometries[i]]
+      const translationMatrix = mat4.create()
+      if(i == 1){
+        mat4.translate(
+          translationMatrix,
+          translationMatrix,
+          [5,0,5]
+        )
+      }
+      if(i == 2){
+        mat4.translate(
+          translationMatrix,
+          translationMatrix,
+          [parameters.elapse*settings.cloud.speed,0,0]
+        )
+      }
+
       setPositionAttribute(gl, buffer, programInfo);
       setNormalAttribute(gl,buffer,programInfo);
       // Tell WebGL to use our program when drawing

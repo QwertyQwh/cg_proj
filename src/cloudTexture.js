@@ -1,10 +1,10 @@
 import { drawClouds } from "./drawclouds";
 
-
+    const targetTextureHeight = 1024;
+    const targetTextureWidth = 1024;
+    let fb
 
 function GetCloudTexture(gl, programInfo, buffer, parameters){
-    const targetTextureWidth = 1024;
-    const targetTextureHeight = 1024;
     const targetTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, targetTexture);
     
@@ -24,7 +24,7 @@ function GetCloudTexture(gl, programInfo, buffer, parameters){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     // Create and bind the framebuffer
-    const fb = gl.createFramebuffer();
+    fb = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
     // attach the texture as the first color attachment
     const attachmentPoint = gl.COLOR_ATTACHMENT0;
@@ -34,4 +34,15 @@ function GetCloudTexture(gl, programInfo, buffer, parameters){
     return targetTexture
 }
 
-export {GetCloudTexture}
+function UpdateCloudTexture(gl, programInfo, buffer, parameters,targetTexture){
+    gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+    
+    // Create and bind the framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    // attach the texture as the first color attachment
+    gl.viewport(0, 0, targetTextureWidth, targetTextureHeight);
+    drawClouds(gl, programInfo, buffer, parameters)
+    return targetTexture
+}
+
+export {GetCloudTexture,UpdateCloudTexture}

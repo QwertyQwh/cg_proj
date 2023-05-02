@@ -6,7 +6,7 @@ import { settings } from "./settings";
 function drawClouds(gl, programInfo, buffer, parameters) {
     gl.clearColor(0., 0., 0., 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT );
-    const projectionMatrix = GetCameraMatrix(gl,true,settings.shadow.bound,1.);
+    const projectionMatrix = GetCameraMatrix(gl,true,settings.cloud.bound,1.);
     const type = gl.UNSIGNED_INT;
     const offset = 0;
     const controlMatrix = mat4.create();
@@ -24,7 +24,11 @@ function drawClouds(gl, programInfo, buffer, parameters) {
     //   )
     const rotationMatrix = mat4.create()
     const translationMatrix = mat4.create()
-    
+      mat4.translate(
+        translationMatrix,
+        translationMatrix,
+        [parameters.elapse*settings.cloud.speed,0,0]
+      )
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
       setPositionAttribute(gl, buffer, programInfo);

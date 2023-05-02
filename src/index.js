@@ -15,7 +15,7 @@ import { loadTexture } from './utils/textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 import { settings } from './settings'
-import { GetCloudTexture } from './cloudTexture'
+import { GetCloudTexture, UpdateCloudTexture } from './cloudTexture'
 import { drawClouds } from './drawclouds'
 
 const PI = 3.1415926
@@ -170,11 +170,7 @@ function main() {
   // Load textures
   // const texture = loadTexture(gl, clouds,gl.RGBA);
   const texture = GetCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters);
-  // Flip image pixels into the bottom-to-top order that WebGL expects.
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  // Tell WebGL we want to affect texture unit 0
   gl.activeTexture(gl.TEXTURE0);
   // Bind the texture to texture unit 0
   gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -185,9 +181,8 @@ function main() {
   programInfos.wire.forEach((val)=>{
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
-
+  // Flip image pixels into the bottom-to-top order that WebGL expects.
   
-
   let then = 0;
   let elapse = 0;
   let start;
@@ -211,7 +206,11 @@ function main() {
     renderMode = renderModes[curRenderMode]
     parameters.model = sceneModes[curSceneMode]
     parameters.curGeometries = sceneGeometries[parameters.model]
-    drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
+    UpdateCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters,texture)
+    // Tell WebGL we want to affect texture unit 0
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
     // drawClouds(gl,cloudProgramInfo,buffers.cloud,parameters)
     requestAnimationFrame(render);
   }
