@@ -2,7 +2,8 @@ import { mat4,vec4,vec3 } from "gl-matrix";
 import { cos,pi,sin } from "mathjs";
 import { GetCameraMatrix } from "./camera";
 
-function drawScene(gl, programInfos, buffers, parameters, shaderMode,elapse) {
+function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
@@ -14,7 +15,6 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode,elapse) {
     const offset = 0;
     const background = vec4.create()
       vec4.set(background,parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0)
-      const modelViewMatrix = mat4.create();
     const controlMatrix = mat4.create();
     const cameraPos = [parameters.radius*cos(parameters.cameraTheta)*sin(parameters.cameraAlpha),parameters.radius*sin(parameters.cameraTheta),-parameters.radius*cos(parameters.cameraTheta)*cos(parameters.cameraAlpha)]
     mat4.lookAt(
@@ -52,11 +52,6 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode,elapse) {
         programInfo.uniformLocations.projectionMatrix,
         false,
         projectionMatrix
-      );
-      gl.uniformMatrix4fv(
-        programInfo.uniformLocations.modelViewMatrix,
-        false,
-        modelViewMatrix
       );
       gl.uniformMatrix4fv(
         programInfo.uniformLocations.controlMatrix,

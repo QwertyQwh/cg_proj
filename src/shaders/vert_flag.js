@@ -2,7 +2,6 @@ const vert= /*glsl*/ `
 precision highp float;
 attribute vec4 aVertexPosition;
 attribute vec4 aVertexNormal;
-uniform mat4 uModelViewMatrix;
 uniform mat4 uTranslationMatrix;
 uniform mat4 uRotationMatrix;
 uniform mat4 uControlMatrix;
@@ -19,7 +18,7 @@ void main(void) {
   gl_Position.z = (sin((gl_Position.x+offset)*freq)-sin(offset*freq))*amplify;
   vNormal = vec3(-cos((gl_Position.x+offset)*freq)*amplify * normAmplify,0.,1.);
   vNormal = (uRotationMatrix* vec4(vNormal,1.)).xyz;
-  gl_Position = uProjectionMatrix * uControlMatrix * uTranslationMatrix* uRotationMatrix*uModelViewMatrix* gl_Position; 
+  gl_Position = uProjectionMatrix * uControlMatrix * uTranslationMatrix* uRotationMatrix*gl_Position; 
   vPosition = aVertexPosition.xyz;
 }
 `;

@@ -7,8 +7,10 @@ const zNearO = -100;
 const zFar = 1000.0;
 const projectionMatrix = mat4.create();
 
-function GetCameraMatrix(gl,isOrtho,bound){
-    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+function GetCameraMatrix(gl,isOrtho,bound,aspect){
+    if(!aspect){
+      aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    }
     if(!isOrtho){
       mat4.perspective(projectionMatrix, fieldOfView, aspect, zNearP, zFar);
     }else{

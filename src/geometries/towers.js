@@ -8,8 +8,8 @@ import { random } from 'mathjs'
 function AddTowers(positions,normals,indices,wires,info,{count,mazeWidth,mazeDepth,bound,height}){
     const sampleParams = {
         bound:bound,
-        min: bound*0.3,
-        max: bound*0.8,
+        min: bound*0.6,
+        max: bound*0.9,
         attempts: 20,
         count: count
     }
@@ -30,4 +30,4 @@ function AddTower(positions,normals,indices,wires,info,modelParams){
 }
 
 
-export {AddTowers}
+export {AddTowers,AddTower}

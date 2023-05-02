@@ -34,7 +34,17 @@ void main(void) {
   float forwardStr = max(dot(uLightDirRight,normal),0.);
   forwardStr *= forwardStr;
   gl_FragColor = leftStr*uLightColorLeft + rightStr*uLightColorLeft + backwardStr*uLightColorRight + forwardStr*uLightColorRight + max(dot(-uLightDirTop,normal),0.)*uLightColorTop;
-  gl_FragColor = mix(gl_FragColor,uLightColorLeft,texture2D(uMatSampler, vec2(vPosition.x/40.+0.5,vPosition.z/40.+0.5)).x*.5);
+  vec2 shadowCoord = vec2(vPosition.x/100.+0.5,vPosition.z/100.+0.5);
+  float shadow = 0. ;
+  for (float i = -0.002; i < 0.003; i += 0.001){
+    for (float j = -0.002; j < 0.003; j += 0.001){
+      shadow+= texture2D(uMatSampler, vec2(shadowCoord.x+i,shadowCoord.y+j)).x;
+    }
+  }
+  shadow = shadow*0.04;
+  if(vPosition.y<15.){
+    gl_FragColor = mix(gl_FragColor,uLightColorLeft,shadow*.6);
+  }
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
   // gl_FragColor = vec4(vNormal.xyz,1.);
   float factor = (vPosition.y-uFogStart)/uFogHeight;

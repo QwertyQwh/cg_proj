@@ -1,18 +1,22 @@
 import { InitShaderProgram } from "./utils"
-function InitPrograms(gl,  vsSources, fsSources){
+function InitScenePrograms(gl,  vsSources, fsSources){
     const wire = InitShaderProgram(gl,vsSources.static, fsSources.wire)
     const matcap = InitShaderProgram(gl,vsSources.static, fsSources.matcap)
     const flagWire = InitShaderProgram(gl,vsSources.flag, fsSources.wire)
     const flagMatcap = InitShaderProgram(gl,vsSources.flag, fsSources.matcap)
+    const cloudWire = InitShaderProgram(gl,vsSources.cloud, fsSources.wire)
+    const cloudMatcap = InitShaderProgram(gl,vsSources.cloud, fsSources.matcap)
     return {
         wire:wire,
         matcap: matcap,
         flagWire: flagWire,
-        flagMatcap: flagMatcap
+        flagMatcap: flagMatcap,
+        cloudWire: cloudWire,
+        cloudMatcap: cloudMatcap
     }
 }
 
-function GenerateProgramInfo(gl, programs){
+function GenerateSceneProgramInfo(gl, programs){
     const wireProgram = programs.wire
     const wireInfo = {
         program: wireProgram,
@@ -22,7 +26,6 @@ function GenerateProgramInfo(gl, programs){
         },
         uniformLocations: {
           projectionMatrix: gl.getUniformLocation(wireProgram,"uProjectionMatrix"),
-          modelViewMatrix: gl.getUniformLocation(wireProgram, "uModelViewMatrix"),
           controlMatrix: gl.getUniformLocation(wireProgram, "uControlMatrix"),
           translationMatrix: gl.getUniformLocation(wireProgram, "uTranslationMatrix"),
           rotationMatrix: gl.getUniformLocation(wireProgram, "uRotationMatrix"),
@@ -40,7 +43,6 @@ function GenerateProgramInfo(gl, programs){
           },
           uniformLocations: {
             projectionMatrix: gl.getUniformLocation(flagWireProgram,"uProjectionMatrix"),
-            modelViewMatrix: gl.getUniformLocation(flagWireProgram, "uModelViewMatrix"),
             controlMatrix: gl.getUniformLocation(flagWireProgram, "uControlMatrix"),
             translationMatrix: gl.getUniformLocation(flagWireProgram, "uTranslationMatrix"),
             rotationMatrix: gl.getUniformLocation(flagWireProgram, "uRotationMatrix"),
@@ -49,6 +51,23 @@ function GenerateProgramInfo(gl, programs){
             uTime: gl.getUniformLocation(flagWireProgram,"uTime"),
           },
         };
+        const cloudWireProgram = programs.cloudWire
+        const cloudWireInfo = {
+            program: cloudWireProgram,
+            attribLocations: {
+              vertexPosition: gl.getAttribLocation(cloudWireProgram, "aVertexPosition"),
+                vertexNormal: gl.getAttribLocation(cloudWireProgram, "aVertexNormal"),
+            },
+            uniformLocations: {
+              projectionMatrix: gl.getUniformLocation(cloudWireProgram,"uProjectionMatrix"),
+              controlMatrix: gl.getUniformLocation(cloudWireProgram, "uControlMatrix"),
+              translationMatrix: gl.getUniformLocation(cloudWireProgram, "uTranslationMatrix"),
+              rotationMatrix: gl.getUniformLocation(cloudWireProgram, "uRotationMatrix"),
+              backgroundColor: gl.getUniformLocation(cloudWireProgram,"uBackground"),
+              uCameraPos: gl.getUniformLocation(cloudWireProgram, "uCameraPos"),
+              uTime: gl.getUniformLocation(cloudWireProgram,"uTime"),
+            },
+          };
       const matcapProgram = programs.matcap
       const matcapInfo = {
           program: matcapProgram,
@@ -58,7 +77,6 @@ function GenerateProgramInfo(gl, programs){
           },
           uniformLocations: {
             projectionMatrix: gl.getUniformLocation(matcapProgram,"uProjectionMatrix"),
-            modelViewMatrix: gl.getUniformLocation(matcapProgram, "uModelViewMatrix"),
             controlMatrix: gl.getUniformLocation(matcapProgram, "uControlMatrix"),
             translationMatrix: gl.getUniformLocation(matcapProgram, "uTranslationMatrix"),
             rotationMatrix: gl.getUniformLocation(matcapProgram, "uRotationMatrix"),
@@ -85,7 +103,6 @@ function GenerateProgramInfo(gl, programs){
             },
             uniformLocations: {
               projectionMatrix: gl.getUniformLocation(flagMatcapProgram,"uProjectionMatrix"),
-              modelViewMatrix: gl.getUniformLocation(flagMatcapProgram, "uModelViewMatrix"),
               controlMatrix: gl.getUniformLocation(flagMatcapProgram, "uControlMatrix"),
               translationMatrix: gl.getUniformLocation(flagMatcapProgram, "uTranslationMatrix"),
               rotationMatrix: gl.getUniformLocation(flagMatcapProgram, "uRotationMatrix"),
@@ -103,10 +120,60 @@ function GenerateProgramInfo(gl, programs){
               uTime: gl.getUniformLocation(flagMatcapProgram,"uTime"),
           },
           };
+          const cloudMatcapProgram = programs.cloudMatcap
+          const cloudMatcapInfo = {
+              program: cloudMatcapProgram,
+              attribLocations: {
+                vertexPosition: gl.getAttribLocation(cloudMatcapProgram, "aVertexPosition"),
+                vertexNormal: gl.getAttribLocation(cloudMatcapProgram, "aVertexNormal"),
+              },
+              uniformLocations: {
+                projectionMatrix: gl.getUniformLocation(cloudMatcapProgram,"uProjectionMatrix"),
+                controlMatrix: gl.getUniformLocation(cloudMatcapProgram, "uControlMatrix"),
+                translationMatrix: gl.getUniformLocation(cloudMatcapProgram, "uTranslationMatrix"),
+                rotationMatrix: gl.getUniformLocation(cloudMatcapProgram, "uRotationMatrix"),
+                backgroundColor: gl.getUniformLocation(cloudMatcapProgram,"uBackground"),
+                fogStart: gl.getUniformLocation(cloudMatcapProgram,"uFogStart"),
+                fogHeight: gl.getUniformLocation(cloudMatcapProgram,"uFogHeight"),
+                uMatSampler: gl.getUniformLocation(cloudMatcapProgram, "uMatSampler"),
+                uCameraPos: gl.getUniformLocation(cloudMatcapProgram, "uCameraPos"),
+                uLightDirTop: gl.getUniformLocation(cloudMatcapProgram, "uLightDirTop"),
+                uLightColorTop: gl.getUniformLocation(cloudMatcapProgram, "uLightColorTop"),
+                uLightDirLeft: gl.getUniformLocation(cloudMatcapProgram, "uLightDirLeft"),
+                uLightColorLeft: gl.getUniformLocation(cloudMatcapProgram, "uLightColorLeft"),
+                uLightDirRight: gl.getUniformLocation(cloudMatcapProgram, "uLightDirRight"),
+                uLightColorRight: gl.getUniformLocation(cloudMatcapProgram, "uLightColorRight"),
+                uTime: gl.getUniformLocation(cloudMatcapProgram,"uTime"),
+            },
+            };
         return {
-            wire: [wireInfo,flagWireInfo],
-            matcap: [matcapInfo,flagMatcapInfo],
+            wire: [wireInfo,flagWireInfo,cloudWireInfo],
+            matcap: [matcapInfo,flagMatcapInfo,cloudMatcapInfo],
         }
 }
 
-export {InitPrograms, GenerateProgramInfo}
+function InitCloudPrograms(gl,  vsSources, fsSources){
+  const bw = InitShaderProgram(gl,vsSources.cloud, fsSources.white)
+  return bw
+}
+function GenerateCloudProgramInfo(gl, program){
+      const bwProgram = program
+      const bwInfo = {
+          program: bwProgram,
+          attribLocations: {
+            vertexPosition: gl.getAttribLocation(bwProgram, "aVertexPosition"),
+            vertexNormal: gl.getAttribLocation(bwProgram, "aVertexNormal"),
+          },
+          uniformLocations: {
+            projectionMatrix: gl.getUniformLocation(bwProgram,"uProjectionMatrix"),
+            controlMatrix: gl.getUniformLocation(bwProgram, "uControlMatrix"),
+            translationMatrix: gl.getUniformLocation(bwProgram, "uTranslationMatrix"),
+            rotationMatrix: gl.getUniformLocation(bwProgram, "uRotationMatrix"),
+            uTime: gl.getUniformLocation(bwProgram,"uTime"),
+        },
+        };
+      return bwInfo
+}
+
+
+export {InitScenePrograms, GenerateSceneProgramInfo,InitCloudPrograms,GenerateCloudProgramInfo }

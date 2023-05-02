@@ -3,16 +3,20 @@ import vert_static from './shaders/vert_static'
 import vert_flag from './shaders/vert_flag'
 import frag_matcap from './shaders/frag_matcap'
 import frag_wire from './shaders/frag_wire'
+import frag_white from './shaders/frag_white'
+import vert_cloud from './shaders/vert_cloud'
 import {Interpolate, ResizeCanvas } from './utils/utils'
 import { initBuffers } from './geometry'
 import { drawScene } from './drawscene'
 import { max,min } from 'mathjs'
-import {InitPrograms, GenerateProgramInfo} from './utils/programs'
+import {InitScenePrograms, GenerateSceneProgramInfo, InitCloudPrograms, GenerateCloudProgramInfo} from './utils/programs'
 import clouds from './assets/textures/clouds.png'
 import { loadTexture } from './utils/textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 import { settings } from './settings'
+import { GetCloudTexture } from './cloudTexture'
+import { drawClouds } from './drawclouds'
 
 const PI = 3.1415926
 const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0};
@@ -39,15 +43,16 @@ let parameters = {
   fogStart: 20,
   fogHeight: 20,
   elapse:0,
-  curGeometries: null
+  curGeometries: null,
+  translation: null,
+  rotation: null,
 }
 
 const sceneGeometries = {
   maze:{
-    geometries: ["maze",'flag'],
-    instance : [1, 5],
-    parameters: [null, null],
-    programs: [0,1],
+    geometries: ["maze",'flag','cloud'],
+    instance : [{}, {},{}], //for using instancing later
+    programs: [0,1,2],
   },
   modelFlat:{
     geometries: ['modelFlat'],
@@ -61,12 +66,14 @@ const sceneGeometries = {
 
 const vsSource = {
   static: vert_static,
-  flag: vert_flag
+  flag: vert_flag,
+  cloud: vert_cloud,
 }
 
 const fsSource = {
   wire: frag_wire,
   matcap: frag_matcap,
+  white: frag_white,
 }
 
 function SubsribeToEvents(){
@@ -153,17 +160,20 @@ function main() {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   const ext = gl.getExtension("OES_element_index_uint");
   // Call some utility function to initialize the program
-  const programs = InitPrograms(gl,vsSource,fsSource)
-  const programInfos = GenerateProgramInfo(gl,programs)
+  const programs = InitScenePrograms(gl,vsSource,fsSource)
+  const programInfos = GenerateSceneProgramInfo(gl,programs)
+  const cloudProgram = InitCloudPrograms(gl,vsSource,fsSource)
+  const cloudProgramInfo = GenerateCloudProgramInfo(gl,cloudProgram)
+  console.log(cloudProgramInfo)
   const buffers = initBuffers(gl);
 
-
   // Load textures
-  const texture = loadTexture(gl, clouds,gl.RGBA);
-  console.log(texture)
+  // const texture = loadTexture(gl, clouds,gl.RGBA);
+  const texture = GetCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters);
   // Flip image pixels into the bottom-to-top order that WebGL expects.
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
+  
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   // Tell WebGL we want to affect texture unit 0
   gl.activeTexture(gl.TEXTURE0);
   // Bind the texture to texture unit 0
@@ -202,6 +212,7 @@ function main() {
     parameters.model = sceneModes[curSceneMode]
     parameters.curGeometries = sceneGeometries[parameters.model]
     drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
+    // drawClouds(gl,cloudProgramInfo,buffers.cloud,parameters)
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

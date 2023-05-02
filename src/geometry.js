@@ -2,10 +2,9 @@ import { LoadModel } from "./geometries/objLoader";
 import { Maze } from "./geometries/maze";
 import { AddMazeBlock } from "./geometries/mazeGeometry";
 import { AddModel } from "./geometries/model";
-import cone from './assets/models/cone.obj'
 import suzanne from './assets/models/suzanne.obj'
 import { settings } from "./settings";
-import { AddTowers } from "./geometries/towers";
+import { AddTowers,AddTower } from "./geometries/towers";
 import { AddFlag } from "./geometries/flag";
 import { AddCloud } from "./geometries/cloud";
 function initMazeBuffers(gl) {
@@ -34,22 +33,30 @@ function initMazeBuffers(gl) {
       AddMazeBlock(maze.nodes[i][j],{...blockParam,width:mazeP.width,height:mazeP.height}, positions,normals,indices,wires,info)
     }
   }
+  //Corners
+  const cornerParams = {
+    offsetY:8,
+    offsetX: (-mazeP.width*.5 +1.)*blockParam.size, 
+    offsetZ: (-mazeP.height*.5+1.)*blockParam.size, 
+    scale:1.,
+    smoothen: false
+  }
+  AddTower(positions,normals,indices,wires,info,cornerParams)
+  cornerParams.offsetX += (mazeP.width-2.)*blockParam.size
+  AddTower(positions,normals,indices,wires,info,cornerParams)
+  cornerParams.offsetZ += (mazeP.height-2.)*blockParam.size
+  AddTower(positions,normals,indices,wires,info,cornerParams)
+  cornerParams.offsetX-=(mazeP.width-2.)*blockParam.size
+  AddTower(positions,normals,indices,wires,info,cornerParams)
+  // Random Towers
   const towerParams = {
-    count:20,
+    count:10,
     mazeDepth: (mazeP.height+1)*blockParam.size,
     mazeWidth: (mazeP.width+1)*blockParam.size,
     bound: 2*mazeP.height*blockParam.size,
-    height: 7
+    height: 3
    }
   AddTowers(positions,normals,indices,wires,info,towerParams)
-  // AddModel(positions,normals,indices,wires,info,{file:cone,smoothen:false,offsetY: 5})
-  const flagParams = {
-    offsetY:20,
-    offsetX:-15,
-    scale:.5,
-    smoothen: false
-  }
-  AddCloud(positions,normals,indices,wires,info,flagParams)
   //Bind buffers to arrays
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -139,10 +146,46 @@ function initBuffers(gl){
   const modelSmooth = initModelBuffers(gl,true)
   const maze = initMazeBuffers(gl)
   const flag = initFlagBuffers(gl)
-  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag};
+  const cloud = initCloudBuffers(gl)
+  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud};
 }
 
+function initCloudBuffers(gl) {
+  const positionBuffer = gl.createBuffer();
+  const normalBuffer = gl.createBuffer();
+  const indexBuffer = gl.createBuffer();
+  const indexWireBuffer = gl.createBuffer();
+  let info = {
+    position: positionBuffer,
+    normals: normalBuffer,
+    indices: indexBuffer,
+    wireIndices: indexWireBuffer,
+    vertexCount: 0,
+    wireCount: 0,
+  }
 
+  let positions = []
+  let normals = []
+  let indices = []
+  let wires = []
+  const cloudParams = {
+    offsetY:settings.shadow.height,
+    offsetX:5,
+    scale:.2,
+    smoothen: false
+  }
+  AddCloud(positions,normals,indices,wires,info,cloudParams)
+  //Bind buffers to arrays
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexWireBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(wires),gl.STATIC_DRAW);
+  return info;
+}
 
 
 
