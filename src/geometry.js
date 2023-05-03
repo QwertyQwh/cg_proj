@@ -7,7 +7,9 @@ import { AddTowers,AddTower } from "./geometries/towers";
 import { AddFlag } from "./geometries/flag";
 import { AddCloud } from "./geometries/cloud";
 import { AddCube } from "./geometries/cube";
-function initMazeBuffers(gl) {
+import { PoissonSample } from "./utils/poisson";
+import { random } from "mathjs";
+function initMazeBuffers(gl,flagInstance) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
   const indexBuffer = gl.createBuffer();
@@ -42,12 +44,16 @@ function initMazeBuffers(gl) {
     smoothen: false
   }
   AddTower(positions,normals,indices,wires,info,cornerParams)
+  flagInstance.push({translation:[cornerParams.offsetX,8,cornerParams.offsetZ],scale :[0.5,0.5,0.5]})
   cornerParams.offsetX += (mazeP.width-2.)*blockParam.size
   AddTower(positions,normals,indices,wires,info,cornerParams)
+  flagInstance.push({translation:[cornerParams.offsetX,8,cornerParams.offsetZ],scale :[0.5,0.5,0.5]})
   cornerParams.offsetZ += (mazeP.height-2.)*blockParam.size
   AddTower(positions,normals,indices,wires,info,cornerParams)
+  flagInstance.push({translation:[cornerParams.offsetX,8,cornerParams.offsetZ],scale :[0.5,0.5,0.5]})
   cornerParams.offsetX-=(mazeP.width-2.)*blockParam.size
   AddTower(positions,normals,indices,wires,info,cornerParams)
+  flagInstance.push({translation:[cornerParams.offsetX,8,cornerParams.offsetZ],scale :[0.5,0.5,0.5]})
   // Random Towers
   const towerParams = {
     count:10,
@@ -99,7 +105,7 @@ function initModelBuffers(gl,smoothen) {
     return info;
   }
 
-function initFlagBuffers(gl) {
+function initFlagBuffers(gl,instanceInfo) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
   const indexBuffer = gl.createBuffer();
@@ -117,8 +123,8 @@ wireIndices: indexWireBuffer,
 vertexCount: 0,
 }  
 const flagParams = {
-  offsetY:10,
-  scale:.5,
+  offsetY:3.0,
+  scale:.2,
   smoothen: false
 }
 AddFlag(positions,normals,indices,wires,info,flagParams)
@@ -135,10 +141,7 @@ AddFlag(positions,normals,indices,wires,info,flagParams)
   return info;
 }
 
-
-
-  
-function initCloudBuffers(gl) {
+function initCloudBuffers(gl,instanceInfo) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
   const indexBuffer = gl.createBuffer();
@@ -163,6 +166,20 @@ const cloudParams = {
   smoothen: false
 }
 AddCloud(positions,normals,indices,wires,info,cloudParams)
+const sampleParams = {
+  bound: settings.cloud.bound,
+  min: settings.cloud.bound*0.4,
+  max: settings.cloud.bound*0.8,
+  attempts: 20,
+  count: 10,
+  first: [-settings.cloud.bound*0.1, settings.cloud.bound*0.05]
+}
+const points = PoissonSample(sampleParams)
+
+points.forEach((val)=>{
+  const offsetY =  random(0,10)
+  instanceInfo.push({translation: [val[0],offsetY,val[1]],scale:[0.5,0.5,0.5]})
+})
 //Bind buffers to arrays
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -214,12 +231,12 @@ function InitFloorBuffers(gl){
   return info;
 }
 
-function initBuffers(gl){
+function initBuffers(gl,instanceInfo){
   const modelFlat = initModelBuffers(gl,false) 
   const modelSmooth = initModelBuffers(gl,true)
-  const maze = initMazeBuffers(gl)
-  const flag = initFlagBuffers(gl)
-  const cloud = initCloudBuffers(gl)
+  const maze = initMazeBuffers(gl,instanceInfo.maze.instance.flag)
+  const flag = initFlagBuffers(gl,instanceInfo.maze.instance.flag)
+  const cloud = initCloudBuffers(gl,instanceInfo.maze.instance.cloud)
   const floor = InitFloorBuffers(gl)
   return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud,floor: floor};
 }

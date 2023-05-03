@@ -2,13 +2,14 @@ import { mat4,vec4,vec3 } from "gl-matrix";
 import { cos,pi,sin } from "mathjs";
 import { GetCameraMatrix } from "./camera";
 import { settings } from "./settings";
+import { ProperMod } from "./utils/utils";
 
 function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0);
     gl.clearDepth(1.0);
-    gl.enable(gl.DEPTH_TEST); // Enable depth testing
-    gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+    gl.enable(gl.DEPTH_TEST); 
+    gl.depthFunc(gl.LEQUAL); 
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,parameters.radius/2.0/1.4);
@@ -40,20 +41,8 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
       const programInfo = programInfos[parameters.curGeometries.programs[i]]
       const buffer = buffers[parameters.curGeometries.geometries[i]]
       const translationMatrix = mat4.create()
-      if(i == 1){
-        mat4.translate(
-          translationMatrix,
-          translationMatrix,
-          [5,0,5]
-        )
-      }
-      if(i == 2){
-        mat4.translate(
-          translationMatrix,
-          translationMatrix,
-          [parameters.elapse*settings.cloud.speed,0,0]
-        )
-      }
+
+      const instances = parameters.curGeometries.instance[parameters.curGeometries.geometries[i]]
 
       setPositionAttribute(gl, buffer, programInfo);
       setNormalAttribute(gl,buffer,programInfo);
@@ -75,11 +64,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
         false,
         rotationMatrix
       );
-      gl.uniformMatrix4fv(
-        programInfo.uniformLocations.translationMatrix,
-        false,
-        translationMatrix
-      );
+
       gl.uniform4fv(
         programInfo.uniformLocations.backgroundColor,
         background
@@ -130,7 +115,32 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
             parameters.lights.right.color[0],parameters.lights.right.color[1],parameters.lights.right.color[2],1.
           )
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
-          gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
+          if(instances){
+            instances.forEach((val) => {
+              mat4.identity(translationMatrix)
+              if(i == 2){
+                  mat4.translate(
+                    translationMatrix,
+                    translationMatrix,
+                    [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
+                  )
+                }else{
+                  mat4.translate(
+                    translationMatrix,
+                    translationMatrix,
+                    val.translation
+                    )
+                }
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.translationMatrix,
+                false,
+                translationMatrix
+              );
+              gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
+            });
+          }else{
+            gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
+          }
           break;
         case 'wire':
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);

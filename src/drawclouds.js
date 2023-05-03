@@ -2,6 +2,7 @@ import { mat4,vec4,vec3 } from "gl-matrix";
 import { cos,pi,sin } from "mathjs";
 import { GetCameraMatrix } from "./camera";
 import { settings } from "./settings";
+import { ProperMod } from "./utils/utils";
 
 function drawClouds(gl, programInfo, buffer, parameters) {
     gl.clearColor(0., 0., 0., 1.0);
@@ -24,13 +25,13 @@ function drawClouds(gl, programInfo, buffer, parameters) {
     //   )
     const rotationMatrix = mat4.create()
     const translationMatrix = mat4.create()
-      mat4.translate(
-        translationMatrix,
-        translationMatrix,
-        [parameters.elapse*settings.cloud.speed,0,0]
+    mat4.translate(
+      translationMatrix,
+      translationMatrix,
+      [parameters.elapse*settings.cloud.speed,0,0]
       )
-    // Tell WebGL how to pull out the positions from the position
-    // buffer into the vertexPosition attribute.
+      // Tell WebGL how to pull out the positions from the position
+      // buffer into the vertexPosition attribute.
       setPositionAttribute(gl, buffer, programInfo);
       setNormalAttribute(gl,buffer,programInfo);
       // Tell WebGL to use our program when drawing
@@ -40,29 +41,43 @@ function drawClouds(gl, programInfo, buffer, parameters) {
         programInfo.uniformLocations.projectionMatrix,
         false,
         projectionMatrix
-      );
-      gl.uniformMatrix4fv(
-        programInfo.uniformLocations.controlMatrix,
+        );
+        gl.uniformMatrix4fv(
+          programInfo.uniformLocations.controlMatrix,
         false,
         controlMatrix
-      );
-      gl.uniformMatrix4fv(
+        );
+        gl.uniformMatrix4fv(
         programInfo.uniformLocations.rotationMatrix,
         false,
         rotationMatrix
-      );
-      gl.uniformMatrix4fv(
-        programInfo.uniformLocations.translationMatrix,
-        false,
-        translationMatrix
-      );
-      gl.uniform1f(
-        programInfo.uniformLocations.uTime,
-        parameters.elapse
-      )
+        );
+        gl.uniformMatrix4fv(
+          programInfo.uniformLocations.translationMatrix,
+          false,
+          translationMatrix
+          );
+          gl.uniform1f(
+            programInfo.uniformLocations.uTime,
+            parameters.elapse
+            )
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+          const instances = parameters.curGeometries.instance['cloud']
+          instances.forEach((val) => {
+            mat4.identity(translationMatrix)
+            mat4.translate(
+              translationMatrix,
+              translationMatrix,
+              [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
+              )
+          gl.uniformMatrix4fv(
+            programInfo.uniformLocations.translationMatrix,
+            false,
+            translationMatrix
+          );
+          gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
+        });
       // matcap only stuff
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
-      gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
   }
 
   function setPositionAttribute(gl, buffers, programInfo) {

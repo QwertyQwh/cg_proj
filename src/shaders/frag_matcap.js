@@ -44,9 +44,10 @@ void main(void) {
       shadow+= texture2D(uMatSampler, vec2(shadowCoord.x+i,shadowCoord.y+j)).x;
     }
   }
+  float maskFactor = exp(-(uFogHeight-2.0));
   shadow = shadow*0.04;
   if(vPosition.y<20.){
-    gl_FragColor = mix(gl_FragColor,uLightColorLeft*.7,shadow*.6);
+    gl_FragColor = mix(gl_FragColor,uLightColorLeft*.7,shadow*.6*maskFactor);
   }
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
 

@@ -1,4 +1,4 @@
-support instancing?
+change cloud color transparency?
 finish the castle
 Add little pavilion
 lookup fire shader

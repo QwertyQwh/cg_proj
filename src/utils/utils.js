@@ -1,4 +1,13 @@
 import { settings } from "../settings";
+
+function ProperMod(x,y){
+  if(x>=0){
+      return x%y
+  }else{
+      return x%y+y;
+  }
+}
+
 function loadShader(gl, type, source) {
   const shader = gl.createShader(type);  
   gl.shaderSource(shader, source);
@@ -54,4 +63,4 @@ function maze2world(i,j){
   return {x,y}
 }
 
-export  {InitShaderProgram ,ResizeCanvas,Interpolate}
+export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod}

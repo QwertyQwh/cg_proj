@@ -37,7 +37,7 @@ function Randomize(){
     settings.mazeParams.width = floor(random(10,31))
     settings.mazeParams.height = floor(random(10,31))
     settings.mazeParams.hollowCondition = (i,j)=> ((i>=settings.mazeParams.width /2-2&& i<=settings.mazeParams.width /2+2 && j>=settings.mazeParams.height/2-2 && j<=settings.mazeParams.height/2+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j<2)))
-    settings.blockParams.heightModifier = random(0.2,1.2)
+    settings.blockParams.heightModifier = random(0.3,1.0)
     settings.mazeParams.weights.horizontal = random(0.1,0.9)
     settings.mazeParams.weights.stair = random(0.2,0.8)
 }

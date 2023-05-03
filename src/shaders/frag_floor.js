@@ -25,9 +25,8 @@ void main(void) {
     }
   }
   shadow = shadow*0.04;
-  if(vPosition.y<20.){
-    gl_FragColor = mix(uBackground,uLightColorLeft,shadow*.6);
-  }
+  float maskFactor = exp(-(uFogHeight-2.0));
+    gl_FragColor = mix(uBackground,uLightColorLeft,shadow*.6*maskFactor);
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
 }
 `;

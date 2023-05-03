@@ -39,8 +39,8 @@ let parameters = {
   palette: null,
   lights: null,
   model: "maze",
-  fogStart: 20,
-  fogHeight: 20,
+  fogStart: 50,
+  fogHeight: 150,
   elapse:0,
   curGeometries: null,
   translation: null,
@@ -51,12 +51,10 @@ let parameters = {
 const sceneGeometries = {
   maze:{
     geometries: ["maze",'flag','cloud','floor'],
-    instance : [
-    {translation: [0,0,0], scale: [1,1,1]}, 
-    {translation:[0,0,0],scale:[1,1,1]},
-    {translation:[0,0,0],scale:[1,1,1]},
-    {translation:[0,0,0],scale:[1,1,1]}
-    ], 
+    instance : {
+      flag:[],
+      cloud:[],
+    }, 
     programs: [0,1,2,3],
   },
   modelFlat:{
@@ -172,7 +170,8 @@ function main() {
   const cloudProgram = InitCloudPrograms(gl,vsSource,fsSource)
   const cloudProgramInfo = GenerateCloudProgramInfo(gl,cloudProgram)
   console.log(cloudProgramInfo)
-  const buffers = initBuffers(gl);
+    parameters.curGeometries = sceneGeometries[parameters.model]
+    const buffers = initBuffers(gl,sceneGeometries);
 
   // Load textures
   // const texture = loadTexture(gl, clouds,gl.RGBA);
@@ -189,7 +188,6 @@ function main() {
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
   // Flip image pixels into the bottom-to-top order that WebGL expects.
-  
   let then = 0;
   let elapse = 0;
   let start;
