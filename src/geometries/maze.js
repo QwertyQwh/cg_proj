@@ -83,6 +83,7 @@ class Node {
     Visit(){
         this.visited = true
         let next;
+        this.deadEnd = true
         while(true){
           //If all children are visited, we are in a dead end and there was nothing to do
           next = this.#ChooseAvailableChild()
@@ -90,6 +91,7 @@ class Node {
           if(!next){
             break;
           }
+          this.deadEnd = false
           // console.log(next.indices)
           next.Visit()
         }

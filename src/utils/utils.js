@@ -57,10 +57,26 @@ function Interpolate(x,y,ratio){
   return x*ratio+y*(1-ratio)
 }
 
-function maze2world(i,j){
-  const x = (i-settings.mazeParams.width*.5+.5)*settings.blockParams.size
-  const y = (j-settings.mazeParams.height*.5+.5)*settings.blockParams.size
-  return {x,y}
+function maze2world(i,j,h){
+  const x=  mazei2worldx(i)
+  const z = mazej2worldz(j)
+  const y = mazeh2worldy(h)
+  return {x,y,z}
 }
 
-export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod}
+function mazei2worldx(i){
+  const x = (i-settings.mazeParams.width*.5+.5)*settings.blockParams.size
+  return x;
+}
+
+function mazej2worldz(j){
+  const z = (j-settings.mazeParams.height*.5+.5)*settings.blockParams.size
+  return z;
+}
+
+function mazeh2worldy(h){
+  const y = (settings.blockParams.baseHeight+settings.blockParams.heightModifier*h)*settings.blockParams.size
+  return y
+}
+
+export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz}

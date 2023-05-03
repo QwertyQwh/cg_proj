@@ -16,9 +16,12 @@ import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 import { settings,Randomize } from './settings'
 import { GetCloudTexture, UpdateCloudTexture } from './cloudTexture'
+import { InitCharacter } from './character'
+import {arrowHandler } from './movement'
 
 const PI = 3.1415926
 const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0};
+const characterDest = {characterPos:[0,0,0]}
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -45,7 +48,7 @@ let parameters = {
   curGeometries: null,
   translation: null,
   rotation: null,
-  characterPos: [0,0]
+  characterPos: [0,0,0],
 }
 
 const sceneGeometries = {
@@ -81,6 +84,8 @@ const fsSource = {
   floor: frag_floor
 }
 
+
+
 function SubsribeToEvents(){
   // Mouse Events
   window.addEventListener('resize', function(event){
@@ -115,6 +120,10 @@ function SubsribeToEvents(){
       accumulated.radius += delta
     }
   },{passive:false});
+
+  window.addEventListener('keydown', eve=>{
+    arrowHandler?.(eve.key,parameters)
+  })
 }
 
 function InitUI(){
@@ -176,18 +185,19 @@ function main() {
   // Load textures
   // const texture = loadTexture(gl, clouds,gl.RGBA);
   const texture = GetCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters);
+  // Flip image pixels into the bottom-to-top order that WebGL expects.
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.activeTexture(gl.TEXTURE0);
   // Bind the texture to texture unit 0
+  gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  // Tell the shader we bound the texture to texture unit 0
   programInfos.matcap.forEach((val)=>{
+    // Tell the shader we bound the texture to texture unit 0
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
   programInfos.wire.forEach((val)=>{
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
-  // Flip image pixels into the bottom-to-top order that WebGL expects.
+  InitCharacter(parameters,characterDest);
   let then = 0;
   let elapse = 0;
   let start;

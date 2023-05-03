@@ -5,7 +5,7 @@ const height = 20
 
 const settings = {
     mazeParams:{
-        weights:{horizontal: 0.5, stair: 0.4 },
+        weights:{horizontal: 0.5, stair: 0.4, pavilion: 0.5 },
         hollowCondition: (i,j)=> ((i>=width/2-2&& i<=width/2+2 && j>=height/2-2 && j<=height/2+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>width-3)) ||((i>width-3)&& (j>width-3)) ||((i>width-3)&& (j<2))   ),/*|| ((i>0 || j>0) && (i+j*2) %4 == 0) */
         width:width,
         height:height,

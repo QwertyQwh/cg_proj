@@ -19,10 +19,13 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
       vec4.set(background,parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0)
     const controlMatrix = mat4.create();
     const cameraPos = [parameters.radius*cos(parameters.cameraTheta)*sin(parameters.cameraAlpha),parameters.radius*sin(parameters.cameraTheta),-parameters.radius*cos(parameters.cameraTheta)*cos(parameters.cameraAlpha)]
+    cameraPos[0]+= parameters.characterPos[0] 
+    cameraPos[1]+= parameters.characterPos[1] 
+    cameraPos[2]+= parameters.characterPos[2] 
     mat4.lookAt(
       controlMatrix,
       cameraPos,
-      [0,0,0],
+      parameters.characterPos,
       [0,1,0]
       )
       const camera = vec3.create()
