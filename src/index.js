@@ -50,12 +50,13 @@ let parameters = {
 
 const sceneGeometries = {
   maze:{
-    geometries: ["maze",'flag','cloud','floor'],
+    geometries: ["maze",'flag','cloud','floor','dome'],
     instance : {
       flag:[],
       cloud:[],
+      dome: []
     }, 
-    programs: [0,1,2,3],
+    programs: [0,1,2,3,0],
   },
   modelFlat:{
     geometries: ['modelFlat'],
@@ -169,7 +170,6 @@ function main() {
   const programInfos = GenerateSceneProgramInfo(gl,programs)
   const cloudProgram = InitCloudPrograms(gl,vsSource,fsSource)
   const cloudProgramInfo = GenerateCloudProgramInfo(gl,cloudProgram)
-  console.log(cloudProgramInfo)
     parameters.curGeometries = sceneGeometries[parameters.model]
     const buffers = initBuffers(gl,sceneGeometries);
 

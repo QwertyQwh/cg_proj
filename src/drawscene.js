@@ -9,7 +9,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
     gl.clearColor(parameters.palette.background[0], parameters.palette.background[1], parameters.palette.background[2], 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST); 
-    gl.depthFunc(gl.LEQUAL); 
+    gl.depthFunc(gl.LESS); 
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     const projectionMatrix = GetCameraMatrix(gl,parameters.isOrtho,parameters.radius/2.0/1.4);
@@ -115,7 +115,13 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
             parameters.lights.right.color[0],parameters.lights.right.color[1],parameters.lights.right.color[2],1.
           )
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
-          if(instances){
+              mat4.identity(translationMatrix)
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.translationMatrix,
+                false,
+                translationMatrix
+              );
+              if(instances){
             instances.forEach((val) => {
               mat4.identity(translationMatrix)
               if(i == 2){
@@ -139,12 +145,44 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
               gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
             });
           }else{
+    
             gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
           }
           break;
         case 'wire':
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);
-          gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
+          mat4.identity(translationMatrix)
+          gl.uniformMatrix4fv(
+            programInfo.uniformLocations.translationMatrix,
+            false,
+            translationMatrix
+          );
+          if(instances){
+            instances.forEach((val) => {
+              mat4.identity(translationMatrix)
+              if(i == 2){
+                  mat4.translate(
+                    translationMatrix,
+                    translationMatrix,
+                    [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
+                  )
+                }else{
+                  mat4.translate(
+                    translationMatrix,
+                    translationMatrix,
+                    val.translation
+                    )
+                }
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.translationMatrix,
+                false,
+                translationMatrix
+              );
+            gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
+            });
+          }else{
+            gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
+          }
           break;
       }
 
