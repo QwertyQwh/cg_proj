@@ -27,8 +27,6 @@ const renderModes = ["wire","matcap"]
 const sceneModes = ['maze', 'modelFlat','modelSmooth']
 let curRenderMode = 1
 let curSceneMode = 0
-let curPalette = GeneratePalette();
-let curLights = GenerateLights(curPalette)
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
   isOrtho: true,
@@ -123,7 +121,7 @@ function SubsribeToEvents(){
       accumulated.radius += delta
     }
   },{passive:false});
-
+  
   window.addEventListener('keydown', eve=>{
     if(!parameters.isMoving){
       arrowHandler?.(eve.key,parameters,accumulated)
@@ -165,6 +163,8 @@ function InitUI(){
 
 function main() {
   Randomize()
+  let curPalette = GeneratePalette();
+  let curLights = GenerateLights(curPalette)
   //HTML stuff
   SubsribeToEvents()
   InitUI()
@@ -184,9 +184,9 @@ function main() {
   const programInfos = GenerateSceneProgramInfo(gl,programs)
   const cloudProgram = InitCloudPrograms(gl,vsSource,fsSource)
   const cloudProgramInfo = GenerateCloudProgramInfo(gl,cloudProgram)
-    parameters.curGeometries = sceneGeometries[parameters.model]
-    const buffers = initBuffers(gl,sceneGeometries);
-
+  parameters.curGeometries = sceneGeometries[parameters.model]
+  const buffers = initBuffers(gl,sceneGeometries);
+  
   // Load textures
   // const texture = loadTexture(gl, clouds,gl.RGBA);
   const texture = GetCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters);

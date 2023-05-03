@@ -1,4 +1,4 @@
-import { floor, pi, random } from "mathjs"
+import { cos, floor, pi, random } from "mathjs"
 
 const width = 20
 const height = 20
@@ -33,6 +33,10 @@ const settings = {
     character:{
         followDist: 10,
         speed: 3,
+        curveFunc: (t)=> (-cos(pi*t)+1)*.5
+    },
+    environment:{
+        startingColor: 0,
     }
 }
 
@@ -44,5 +48,6 @@ function Randomize(){
     settings.blockParams.heightModifier = random(0.3,1.0)
     settings.mazeParams.weights.horizontal = random(0.1,0.9)
     settings.mazeParams.weights.stair = random(0.2,0.8)
+    settings.environment.startingColor = floor(random(0,4))
 }
 export {settings,Randomize}

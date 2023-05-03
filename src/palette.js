@@ -1,3 +1,5 @@
+import { settings } from "./settings";
+
 const palettes = [
     {
         background: [.753, .898, .769, 1.0],
@@ -26,10 +28,13 @@ const palettes = [
 
 ] 
 
-let curInd = 1
+let curInd = null
 
 
 function GeneratePalette(){
+    if(!curInd){
+        curInd = settings.environment.startingColor
+    }
     curInd = (curInd+1)% palettes.length
     return palettes[curInd];
 }
