@@ -9,7 +9,7 @@ function AddDomes({count,mazeWidth,mazeDepth,bound,height},instanceInfo){
         bound:bound,
         min: bound*0.04,
         max: bound*0.1,
-        attempts: 20,
+        attempts: 8,
         count: count
     }
     const points = PoissonSample(sampleParams)
