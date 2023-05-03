@@ -140,6 +140,9 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
                     val.translation
                     )
                 }
+                if(i == 5){
+                  // console.log(val.translation)
+                }
               gl.uniformMatrix4fv(
                 programInfo.uniformLocations.translationMatrix,
                 false,
@@ -176,6 +179,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
                     val.translation
                     )
                 }
+  
               gl.uniformMatrix4fv(
                 programInfo.uniformLocations.translationMatrix,
                 false,

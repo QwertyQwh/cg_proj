@@ -1,4 +1,7 @@
+import { abs } from "mathjs";
 import { settings } from "../settings";
+
+const threshold = 0.001
 
 function ProperMod(x,y){
   if(x>=0){
@@ -79,4 +82,11 @@ function mazeh2worldy(h){
   return y
 }
 
-export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz}
+function Aprox(a,b){
+  if(abs(a-b)>threshold){
+    return false
+  }
+  return true
+}
+
+export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz,Aprox}

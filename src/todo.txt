@@ -1,5 +1,9 @@
 change cloud color transparency?
+generate pavilion shadows as well
 finish the castle
 lookup fire shader
 
-charater:
+character:
+
+
+uibuttoms:

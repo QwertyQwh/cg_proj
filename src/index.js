@@ -11,17 +11,15 @@ import { initBuffers } from './geometry'
 import { drawScene } from './drawscene'
 import { max,min } from 'mathjs'
 import {InitScenePrograms, GenerateSceneProgramInfo, InitCloudPrograms, GenerateCloudProgramInfo} from './utils/programs'
-import { loadTexture } from './utils/textureLoder'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
 import { settings,Randomize } from './settings'
 import { GetCloudTexture, UpdateCloudTexture } from './cloudTexture'
-import { InitCharacter } from './character'
+import { InitCharacter, MoveCharacter} from './player'
 import {arrowHandler } from './movement'
 
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0};
-const characterDest = {characterPos:[0,0,0]}
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0]};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -45,28 +43,35 @@ let parameters = {
   fogStart: 50,
   fogHeight: 150,
   elapse:0,
+  deltaTime:0,
   curGeometries: null,
   translation: null,
   rotation: null,
   characterPos: [0,0,0],
+  isMoving: false,
 }
 
 const sceneGeometries = {
   maze:{
-    geometries: ["maze",'flag','cloud','floor','dome'],
+    geometries: ["maze",'flag','cloud','floor','dome','character'],
     instance : {
       flag:[],
       cloud:[],
-      dome: []
+      dome: [],
+      character: [{translation: [0,0,0], scale:[1,1,1]}],
     }, 
-    programs: [0,1,2,3,0],
+    programs: [0,1,2,3,0,0],
   },
   modelFlat:{
     geometries: ['modelFlat'],
+    instance : {
+    }, 
     programs: [0],
   },
   modelSmooth:{
     geometries: ['modelSmooth'],
+    instance : {
+    }, 
     programs: [0],
   }
 }
@@ -83,8 +88,6 @@ const fsSource = {
   white: frag_white,
   floor: frag_floor
 }
-
-
 
 function SubsribeToEvents(){
   // Mouse Events
@@ -122,7 +125,9 @@ function SubsribeToEvents(){
   },{passive:false});
 
   window.addEventListener('keydown', eve=>{
-    arrowHandler?.(eve.key,parameters)
+    if(!parameters.isMoving){
+      arrowHandler?.(eve.key,parameters,accumulated)
+    }
   })
 }
 
@@ -197,11 +202,10 @@ function main() {
   programInfos.wire.forEach((val)=>{
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
-  InitCharacter(parameters,characterDest);
+  InitCharacter(parameters,accumulated,sceneGeometries.maze.instance.character);
   let then = 0;
   let elapse = 0;
   let start;
-  let deltaTime = 0
   let renderMode;
   function render(now) {
     now *= 0.001; 
@@ -209,19 +213,24 @@ function main() {
       start = now
     }
     elapse = now-start;
+    parameters.deltaTime = now-then;
     then = now;
     parameters.cameraTheta =  Interpolate(parameters.cameraTheta ,max(min(accumulated.theta+diff.theta,settings.controls.maxTheta)),0.96)
     parameters.cameraAlpha = Interpolate(parameters.cameraAlpha, accumulated.alpha+diff.alpha,0.96);
     parameters.radius = Interpolate(parameters.radius,accumulated.radius,0.96)
     parameters.fogHeight = Interpolate(parameters.fogHeight,accumulated.fogHeight,0.98)
     parameters.fogStart = Interpolate(parameters.fogStart,accumulated.fogStart,0.98)
+    MoveCharacter(parameters,accumulated,sceneGeometries.maze.instance.character)
     parameters.lights = curLights
     parameters.palette = curPalette
     parameters.elapse = elapse
     renderMode = renderModes[curRenderMode]
     parameters.model = sceneModes[curSceneMode]
     parameters.curGeometries = sceneGeometries[parameters.model]
-    UpdateCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters,texture)
+
+    if(parameters.model == 'maze'){
+      UpdateCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters,texture)
+    }
     // Tell WebGL we want to affect texture unit 0
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

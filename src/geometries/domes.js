@@ -7,13 +7,12 @@ import { random } from 'mathjs'
 function AddDomes({count,mazeWidth,mazeDepth,bound,height},instanceInfo){
     const sampleParams = {
         bound:bound,
-        min: bound*0.08,
-        max: bound*0.2,
+        min: bound*0.04,
+        max: bound*0.1,
         attempts: 20,
         count: count
     }
     const points = PoissonSample(sampleParams)
-    
     points.forEach((val)=>{
         if(val[0]>-mazeWidth*.5&&val[0]<mazeWidth*.5&&val[1]>-mazeDepth*.5&& val[1]<mazeDepth*.5){
             return;

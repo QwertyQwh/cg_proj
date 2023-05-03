@@ -1,13 +1,18 @@
 import { floor, pi } from "mathjs"
 import { ProperMod } from "./utils/utils"
+import { settings } from "./settings"
 
 const movementVectors = [[0,0,-1],[-1,0,0],[0,0,1],[1,0,0]]
 
-const arrowHandler = (key,parameters)=>{
+const arrowHandler = (key,parameters,accumulated)=>{
     const vec = GetMovementVector(parameters.cameraAlpha,key)
-    parameters.characterPos[0]+= vec[0]
-    parameters.characterPos[1]+= vec[1]
-    parameters.characterPos[2]+= vec[2]
+    if(vec){
+        accumulated.radius = settings.character.followDist
+        accumulated.characterPos[0]+= vec[0]
+        accumulated.characterPos[1]+= vec[1]
+        accumulated.characterPos[2]+= vec[2]
+    }
+
 }
 
 function GetMovementVector(alpha,dir){
@@ -26,7 +31,7 @@ function GetMovementVector(alpha,dir){
             dirOffset = 3
             break;
         default:
-            return [0,0,0];
+            return null;
     }
     const cameraOffset = floor((-alpha+pi*0.25)/pi*2);
     const index = ProperMod(dirOffset+cameraOffset,4);

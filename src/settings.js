@@ -29,6 +29,10 @@ const settings = {
         bound:50,
         height:25., 
         speed: -0.3,
+    },
+    character:{
+        followDist: 10,
+        speed: 3,
     }
 }
 

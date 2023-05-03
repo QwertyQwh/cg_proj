@@ -7,11 +7,13 @@ import { AddFlag } from "./geometries/flag";
 import { AddCloud } from "./geometries/cloud";
 import { AddCube } from "./geometries/cube";
 import { PoissonSample } from "./utils/poisson";
-import { random } from "mathjs";
+import { max, random } from "mathjs";
 import { AddDome, AddDomes } from "./geometries/domes";
 import { AddTower } from "./geometries/tower";
 import { AddPavilion } from "./geometries/pavilion";
 import { maze2world } from "./utils/utils";
+import { AddCharacter } from "./geometries/character";
+import { InitCharacter } from "./player";
 function initMazeBuffers(gl,flagInstance,pavilionInstance) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
@@ -250,10 +252,10 @@ function initDomeBuffers(gl,instanceInfo) {
   const mazeP = settings.mazeParams
   const blockParam = settings.blockParams
   const domeParams = {
-    count:600,
+    count:1000,
     mazeDepth: (mazeP.height+1)*blockParam.size,
     mazeWidth: (mazeP.width+1)*blockParam.size,
-    bound: 2*mazeP.height*blockParam.size,
+    bound: 3*max(mazeP.height,mazeP.width)*blockParam.size,
     height: 3
   }
   const modelParams = {smoothen:false};
@@ -303,6 +305,37 @@ function initPavilionBuffers(gl,instanceInfo) {
   return info;
 }
 
+function initCharacterBuffers(gl) {
+  const positionBuffer = gl.createBuffer();
+  const normalBuffer = gl.createBuffer();
+  const indexBuffer = gl.createBuffer();
+  const indexWireBuffer = gl.createBuffer();
+  let positions = [];
+  let normals = []
+  let indices = []
+  let wires = []
+  let info = {
+    position: positionBuffer,
+    normals: normalBuffer,
+    indices: indexBuffer,
+    wireIndices: indexWireBuffer,
+    vertexCount: 0,
+  }  
+  const modelParams = {smoothen:false,scale:0.2};
+  AddCharacter(positions,normals,indices,wires,info,modelParams)
+  info.vertexCount = indices.length
+  info.wireCount = wires.length
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexWireBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(wires),gl.STATIC_DRAW);
+  return info;
+}
+
 
 function initBuffers(gl,instanceInfo){
   const modelFlat = initModelBuffers(gl,false) 
@@ -312,7 +345,8 @@ function initBuffers(gl,instanceInfo){
   const cloud = initCloudBuffers(gl,instanceInfo.maze.instance.cloud)
   const floor = InitFloorBuffers(gl)
   const domes = initDomeBuffers(gl,instanceInfo.maze.instance.dome)
-  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud,floor: floor,dome:domes};
+  const character = initCharacterBuffers(gl)
+  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud,floor: floor,dome:domes,character: character};
 }
 
 
