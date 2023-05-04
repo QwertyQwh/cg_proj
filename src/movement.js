@@ -1,12 +1,12 @@
 import { floor, pi } from "mathjs"
-import { ProperMod, maze2worldByNode } from "./utils/utils"
+import { IsMazeIndexValid, ProperMod, maze2worldByNode } from "./utils/utils"
 import { settings } from "./settings"
 
 const movementVectors = [[0,-1],[-1,0],[0,1],[1,0]]
 
 const arrowHandler = (key,parameters,accumulated)=>{
     const vec = GetMovementVector(parameters.cameraAlpha,key)
-    if(vec){
+    if(vec && IsMazeIndexValid(accumulated.node.i +vec[0],accumulated.node.j+vec[1])){
         accumulated.radius = settings.character.followDist
         accumulated.node.i += vec[0]
         accumulated.node.j += vec[1]

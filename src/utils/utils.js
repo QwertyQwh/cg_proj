@@ -94,4 +94,8 @@ function Aprox(a,b){
   return true
 }
 
-export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz,Aprox,maze2worldByNode}
+function IsMazeIndexValid(i,j){
+  return  i>=0 && i<settings.mazeParams.width && j>= 0 && j<settings.mazeParams.height &&  !settings.mazeParams.hollowCondition(i,j)
+}
+
+export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz,Aprox,maze2worldByNode,IsMazeIndexValid}
