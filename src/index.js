@@ -6,6 +6,7 @@ import frag_wire from './shaders/frag_wire'
 import frag_white from './shaders/frag_white'
 import vert_cloud from './shaders/vert_cloud'
 import frag_floor from './shaders/frag_floor'
+import {Maze} from './geometries/maze'
 import {Interpolate, ResizeCanvas } from './utils/utils'
 import { initBuffers } from './geometry'
 import { drawScene } from './drawscene'
@@ -20,7 +21,7 @@ import {arrowHandler } from './movement'
 import { drawClouds } from './drawclouds'
 
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0]};
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0],node:{i: 0,j:0}};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -31,7 +32,9 @@ let curSceneMode = 0
 let curPalette 
 let curLights 
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
+
 let parameters = {
+  maze: null,
   isOrtho: true,
   cameraTheta: PI/4,
   cameraAlpha:4*PI/4,
@@ -50,6 +53,8 @@ let parameters = {
   rotation: null,
   characterPos: [0,0,0],
   isMoving: false,
+  totalTravelTime: 1.,
+  traveledTime: 0.
 }
 
 const sceneGeometries = {
@@ -168,6 +173,7 @@ function main() {
   Randomize()
   curPalette = GeneratePalette();
   curLights = GenerateLights(curPalette)
+  parameters.maze = new Maze(settings.mazeParams)
   //HTML stuff
   SubsribeToEvents()
   InitUI()
@@ -188,7 +194,7 @@ function main() {
   const cloudProgram = InitCloudPrograms(gl,vsSource,fsSource)
   const cloudProgramInfo = GenerateCloudProgramInfo(gl,cloudProgram)
   parameters.curGeometries = sceneGeometries[parameters.model]
-  const buffers = initBuffers(gl,sceneGeometries);
+  const buffers = initBuffers(gl,sceneGeometries,parameters.maze);
   
   // Load textures
   // const texture = loadTexture(gl, clouds,gl.RGBA);

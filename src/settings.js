@@ -1,4 +1,4 @@
-import { cos, floor, pi, random } from "mathjs"
+import { cos, floor, pi, random, sin } from "mathjs"
 
 const width = 20
 const height = 20
@@ -33,7 +33,8 @@ const settings = {
     character:{
         followDist: 10,
         speed: 3,
-        curveFunc: (t)=> (-cos(pi*t)+1)*.5
+        curveFunc: (t)=> (-cos(pi*t)+1)*.5,
+        curveGrad: (t)=>  .5*pi*sin(pi*t),
     },
     environment:{
         startingColor: 0,

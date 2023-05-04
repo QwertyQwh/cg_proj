@@ -1,16 +1,19 @@
 import { floor, pi } from "mathjs"
-import { ProperMod } from "./utils/utils"
+import { ProperMod, maze2worldByNode } from "./utils/utils"
 import { settings } from "./settings"
 
-const movementVectors = [[0,0,-1],[-1,0,0],[0,0,1],[1,0,0]]
+const movementVectors = [[0,-1],[-1,0],[0,1],[1,0]]
 
 const arrowHandler = (key,parameters,accumulated)=>{
     const vec = GetMovementVector(parameters.cameraAlpha,key)
     if(vec){
         accumulated.radius = settings.character.followDist
-        accumulated.characterPos[0]+= vec[0]
-        accumulated.characterPos[1]+= vec[1]
-        accumulated.characterPos[2]+= vec[2]
+        accumulated.node.i += vec[0]
+        accumulated.node.j += vec[1]
+        const worldPos = maze2worldByNode(parameters.maze, accumulated.node.i,accumulated.node.j)
+        accumulated.characterPos[0] = worldPos.x
+        accumulated.characterPos[1] = worldPos.y
+        accumulated.characterPos[2] = worldPos.z
     }
 
 }

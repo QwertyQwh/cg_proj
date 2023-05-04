@@ -67,6 +67,11 @@ function maze2world(i,j,h){
   return {x,y,z}
 }
 
+function maze2worldByNode(maze,i,j){
+  console.log(maze)
+  return maze2world(i,j,maze.nodes[i][j].indices.h)
+}
+
 function mazei2worldx(i){
   const x = (i-settings.mazeParams.width*.5+.5)*settings.blockParams.size
   return x;
@@ -89,4 +94,4 @@ function Aprox(a,b){
   return true
 }
 
-export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz,Aprox}
+export  {InitShaderProgram ,ResizeCanvas,Interpolate,ProperMod,maze2world,mazeh2worldy,mazei2worldx,mazej2worldz,Aprox,maze2worldByNode}

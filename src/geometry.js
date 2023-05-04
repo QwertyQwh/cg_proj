@@ -1,5 +1,4 @@
 import { LoadModel } from "./geometries/objLoader";
-import { Maze } from "./geometries/maze";
 import { AddMazeBlock } from "./geometries/mazeGeometry";
 import suzanne from './assets/models/suzanne.obj'
 import { settings } from "./settings";
@@ -14,7 +13,7 @@ import { AddPavilion } from "./geometries/pavilion";
 import { maze2world } from "./utils/utils";
 import { AddCharacter } from "./geometries/character";
 import { InitCharacter } from "./player";
-function initMazeBuffers(gl,flagInstance,pavilionInstance) {
+function initMazeBuffers(gl,flagInstance,maze) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
   const indexBuffer = gl.createBuffer();
@@ -27,13 +26,13 @@ function initMazeBuffers(gl,flagInstance,pavilionInstance) {
     vertexCount: 0,
     wireCount: 0,
   }
+  console.log(maze)
 
   let positions = []
   let normals = []
   let indices = []
   let wires = []
   const mazeP = settings.mazeParams
-  const maze = new Maze(mazeP)
   const blockParam = settings.blockParams
   for(let i = 0; i<mazeP.width; i++){
     for(let j = 0; j< mazeP.height; j++){
@@ -347,16 +346,16 @@ function initCharacterBuffers(gl) {
 }
 
 
-function initBuffers(gl,instanceInfo){
+function initBuffers(gl,instanceInfo,maze){
   const modelFlat = initModelBuffers(gl,false) 
   const modelSmooth = initModelBuffers(gl,true)
-  const maze = initMazeBuffers(gl,instanceInfo.maze.instance.flag)
+  const mazeG = initMazeBuffers(gl,instanceInfo.maze.instance.flag,maze)
   const flag = initFlagBuffers(gl,instanceInfo.maze.instance.flag)
   const cloud = initCloudBuffers(gl,instanceInfo.maze.instance.cloud)
   const floor = InitFloorBuffers(gl)
   const domes = initDomeBuffers(gl,instanceInfo.maze.instance.dome)
   const character = initCharacterBuffers(gl)
-  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:maze, flag: flag,cloud: cloud,floor: floor,dome:domes,character: character};
+  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:mazeG, flag: flag,cloud: cloud,floor: floor,dome:domes,character: character};
 }
 
 
