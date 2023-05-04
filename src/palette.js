@@ -32,7 +32,7 @@ let curInd = null
 
 
 function GeneratePalette(){
-    if(!curInd){
+    if(curInd== null){
         curInd = settings.environment.startingColor
     }
     curInd = (curInd+1)% palettes.length

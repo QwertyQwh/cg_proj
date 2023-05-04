@@ -4,6 +4,7 @@ attribute vec4 aVertexPosition;
 attribute vec4 aVertexNormal;
 uniform mat4 uTranslationMatrix;
 uniform mat4 uRotationMatrix;
+uniform mat4 uScaleMatrix;
 uniform mat4 uControlMatrix;
 uniform mat4 uProjectionMatrix;
 varying vec3 vNormal;

@@ -238,7 +238,7 @@ function main() {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
-    gl.viewport(0, 0, 4096, 4096);
+    // gl.viewport(0, 0, 4096, 4096);
     // drawClouds(gl,cloudProgramInfo,buffers.cloud,parameters)
     requestAnimationFrame(render);
   }

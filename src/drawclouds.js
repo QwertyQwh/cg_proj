@@ -7,7 +7,7 @@ import { ProperMod } from "./utils/utils";
 function drawClouds(gl, programInfo, buffer, parameters) {
     gl.clearColor(0., 0., 0., 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT );
-    const projectionMatrix = GetCameraMatrix(gl,true,settings.cloud.bound,1.);
+    const projectionMatrix = GetCameraMatrix(gl,true,settings.cloud.bound*1.6,1.);
     const type = gl.UNSIGNED_INT;
     const offset = 0;
     const controlMatrix = mat4.create();
@@ -25,6 +25,7 @@ function drawClouds(gl, programInfo, buffer, parameters) {
     //   )
     const rotationMatrix = mat4.create()
     const translationMatrix = mat4.create()
+    const scaleMatrix = mat4.create()
     mat4.translate(
       translationMatrix,
       translationMatrix,
@@ -62,14 +63,22 @@ function drawClouds(gl, programInfo, buffer, parameters) {
             parameters.elapse
             )
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+
           const instances = parameters.curGeometries.instance['cloud']
           instances.forEach((val) => {
             mat4.identity(translationMatrix)
             mat4.translate(
               translationMatrix,
               translationMatrix,
-              [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
+              [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed+settings.cloud.bound*1.6,settings.cloud.bound*3.2) -settings.cloud.bound*1.6,val.translation[1],val.translation[2]]
               )
+              mat4.identity(scaleMatrix)
+              mat4.scale(scaleMatrix,scaleMatrix,val.scale)
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.scaleMatrix,
+                false,
+                scaleMatrix
+              );
           gl.uniformMatrix4fv(
             programInfo.uniformLocations.translationMatrix,
             false,

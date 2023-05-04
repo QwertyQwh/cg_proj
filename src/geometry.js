@@ -162,26 +162,36 @@ let normals = []
 let indices = []
 let wires = []
 const cloudParams = {
-  offsetY:settings.cloud.height,
-  offsetX:5,
   scale:.2,
   smoothen: false
 }
 AddCloud(positions,normals,indices,wires,info,cloudParams)
 const sampleParams = {
-  bound: settings.cloud.bound,
+  bound: settings.cloud.bound*1.4,
   min: settings.cloud.bound*0.4,
-  max: settings.cloud.bound*0.8,
-  attempts: 20,
-  count: 10,
+  max: settings.cloud.bound*1.6,
+  attempts: 15,
+  count: 9,
   first: [-settings.cloud.bound*0.1, settings.cloud.bound*0.05]
 }
-const points = PoissonSample(sampleParams)
-
-points.forEach((val)=>{
-  const offsetY =  random(0,10)
-  instanceInfo.push({translation: [val[0],offsetY,val[1]],scale:[0.5,0.5,0.5]})
+const clusters = PoissonSample(sampleParams)
+const clusterParams = {
+  bound: settings.cloud.bound*1.,
+  min: settings.cloud.bound*0.1,
+  max: settings.cloud.bound*0.3,
+  attempts: 15,
+  count: 7,
+  first: [0,0]
+}
+clusters.forEach((clusterVal)=>{
+  const jitters = PoissonSample(clusterParams)
+  jitters.forEach((val)=>{
+    const offsetY = settings.cloud.height+ random(0,10)
+    const scale = random(0.5,4)
+    instanceInfo.push({translation: [val[0]+clusterVal[0],offsetY,val[1]+clusterVal[1]],scale:[scale,scale,scale]})
+  })
 })
+
 //Bind buffers to arrays
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -213,12 +223,12 @@ function InitFloorBuffers(gl){
   let indices = []
   let wires = []
   const cubeParams = {
-    left: -2*settings.cloud.bound,
-    bottom:-2,
-    near:-2*settings.cloud.bound,
-    width: 4*settings.cloud.bound,
-    height:2,
-    depth:4*settings.cloud.bound
+    left: -1.6*settings.cloud.bound,
+    bottom:-.1,
+    near:-1.6*settings.cloud.bound,
+    width: 3.2*settings.cloud.bound,
+    height:.1,
+    depth:3.2*settings.cloud.bound
   }
   AddCube(positions,normals,indices,wires,info,cubeParams)
   //Bind buffers to arrays
@@ -252,10 +262,10 @@ function initDomeBuffers(gl,instanceInfo) {
   const mazeP = settings.mazeParams
   const blockParam = settings.blockParams
   const domeParams = {
-    count:1000,
+    count:1500,
     mazeDepth: (mazeP.height+1)*blockParam.size,
     mazeWidth: (mazeP.width+1)*blockParam.size,
-    bound: 3*max(mazeP.height,mazeP.width)*blockParam.size,
+    bound: 3*20*blockParam.size,
     height: 3
   }
   const modelParams = {smoothen:false};

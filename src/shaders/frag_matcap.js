@@ -37,7 +37,7 @@ void main(void) {
     float factor = (vPosition.y-uFogStart)/uFogHeight;
   factor = clamp(factor, 0., 1.);
   gl_FragColor = mix(uBackground, gl_FragColor, factor);
-  vec2 shadowCoord = vec2(vPosition.x/100.+0.5,vPosition.z/100.+0.5);
+  vec2 shadowCoord = vec2(vPosition.x/160.+0.5,vPosition.z/160.+0.5);
   float shadow = 0. ;
   for (float i = -0.002; i < 0.003; i += 0.001){
     for (float j = -0.002; j < 0.003; j += 0.001){

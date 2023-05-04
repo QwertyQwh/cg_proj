@@ -37,13 +37,17 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
       rotationMatrix,
       pi*1.25,
       [0,1,0])
+      const translationMatrix = mat4.create()
+      const scaleMatrix = mat4.create()
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
     for(let i = 0; i<parameters.curGeometries.geometries.length; i++){
+      if(i == 2){// I've decided not to render the clouds, only their shadows
+        continue
+      }
       const programInfo = programInfos[parameters.curGeometries.programs[i]]
       const buffer = buffers[parameters.curGeometries.geometries[i]]
-      const translationMatrix = mat4.create()
 
       const instances = parameters.curGeometries.instance[parameters.curGeometries.geometries[i]]
 
@@ -119,6 +123,12 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
           )
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
               mat4.identity(translationMatrix)
+              mat4.identity(scaleMatrix)
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.scaleMatrix,
+                false,
+                scaleMatrix
+              );
               gl.uniformMatrix4fv(
                 programInfo.uniformLocations.translationMatrix,
                 false,
@@ -131,7 +141,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
                   mat4.translate(
                     translationMatrix,
                     translationMatrix,
-                    [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
+                    [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed+settings.cloud.bound*1.3,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
                   )
                 }else{
                   mat4.translate(
