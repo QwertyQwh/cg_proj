@@ -17,6 +17,7 @@ import { settings,Randomize } from './settings'
 import { GetCloudTexture, UpdateCloudTexture } from './cloudTexture'
 import { InitCharacter, MoveCharacter} from './player'
 import {arrowHandler } from './movement'
+import { drawClouds } from './drawclouds'
 
 const PI = 3.1415926
 const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0]};
@@ -27,6 +28,8 @@ const renderModes = ["wire","matcap"]
 const sceneModes = ['maze', 'modelFlat','modelSmooth']
 let curRenderMode = 1
 let curSceneMode = 0
+let curPalette 
+let curLights 
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
 let parameters = {
   isOrtho: true,
@@ -163,8 +166,8 @@ function InitUI(){
 
 function main() {
   Randomize()
-  let curPalette = GeneratePalette();
-  let curLights = GenerateLights(curPalette)
+  curPalette = GeneratePalette();
+  curLights = GenerateLights(curPalette)
   //HTML stuff
   SubsribeToEvents()
   InitUI()
@@ -235,6 +238,7 @@ function main() {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
+    gl.viewport(0, 0, 4096, 4096);
     // drawClouds(gl,cloudProgramInfo,buffers.cloud,parameters)
     requestAnimationFrame(render);
   }
