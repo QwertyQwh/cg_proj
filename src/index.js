@@ -152,7 +152,7 @@ function SubsribeToEvents(gl){
 
 function InitUI(){
   if(MobileCheck()){
-    promptTxt = 'Hey Mobile Users! Mobile Support is coming. Use a laptop for full experience.'
+    promptTxt = 'Hey Mobile Users! Mobile Support is coming. Use a laptop for now.'
   }
 
   const renderBtn = document.querySelector("button#renderMode");
