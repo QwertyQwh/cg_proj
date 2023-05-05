@@ -1,6 +1,2 @@
 finish the castle
-add depth_of_field
-fix the movement problem
 
-
-uibuttons:

@@ -83,7 +83,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
       )
       // matcap only stuff
       switch(shaderMode){
-        case 'matcap':
+        case 'Solid':
           gl.uniform1f(
             programInfo.uniformLocations.fogStart,
             parameters.fogStart,
@@ -178,7 +178,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
             gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
           }
           break;
-        case 'wire':
+        case 'Wire':
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);
           mat4.identity(translationMatrix)
           mat4.identity(rotationMatrix)

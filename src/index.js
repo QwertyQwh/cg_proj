@@ -7,7 +7,7 @@ import frag_white from './shaders/frag_white'
 import vert_cloud from './shaders/vert_cloud'
 import frag_floor from './shaders/frag_floor'
 import {Maze} from './geometries/maze'
-import {Interpolate, ResizeCanvas } from './utils/utils'
+import {Interpolate, MobileCheck, ResizeCanvas } from './utils/utils'
 import { initBuffers } from './geometry'
 import { drawScene } from './drawScene'
 import { max,min, pi } from 'mathjs'
@@ -20,20 +20,23 @@ import { InitCharacter, MoveCharacter} from './player'
 import {arrowHandler } from './movement'
 import { drawClouds } from './drawClouds'
 import { drawPavilions } from './drawPavilions'
+import { vec3 } from 'gl-matrix'
 
+
+let userIdling = 0
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0],node:{i: 0,j:0}};
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0],node:{i: 0,j:0},scale:1};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
-const renderModes = ["wire","matcap"]
-const sceneModes = ['maze', 'modelFlat','modelSmooth']
+const renderModes = ["Wire","Solid"]
+const sceneModes = ['Maze', 'Suzanne','SmoothSuzanne']
 let curRenderMode = 1
 let curSceneMode = 0
 let curPalette 
 let curLights 
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
-
+const promptTxt = "Use Arrow Keys to navigate. \r\n Drag and Zoom to move around. \r\n Press Space to refocus. "
 let parameters = {
   maze: null,
   isOrtho: true,
@@ -44,9 +47,9 @@ let parameters = {
   floor: 0,
   palette: null,
   lights: null,
-  model: "maze",
-  fogStart: 50,
-  fogHeight: 150,
+  model: "Maze",
+  fogStart: 40,
+  fogHeight: 80,
   elapse:0,
   deltaTime:0,
   curGeometries: null,
@@ -54,12 +57,13 @@ let parameters = {
   rotation: null,
   characterPos: [0,0,0],
   isMoving: false,
-  totalTravelTime: 4.,
+  totalTravelTime: 0.8,
+  travelVec: vec3.create(),
   traveledTime: 0.
 }
 
 const sceneGeometries = {
-  maze:{
+  Maze:{
     geometries: ["maze",'flag','cloud','floor','dome','pavilion','upper','middle','lower'],
     instance : {
       flag:[],
@@ -72,14 +76,14 @@ const sceneGeometries = {
     }, 
     programs: [0,1,2,3,0,0,0,0,0],
   },
-  modelFlat:{
-    geometries: ['modelFlat'],
+  Suzanne:{
+    geometries: ['Suzanne'],
     instance : {
     }, 
     programs: [0],
   },
-  modelSmooth:{
-    geometries: ['modelSmooth'],
+  SmoothSuzanne:{
+    geometries: ['SmoothSuzanne'],
     instance : {
     }, 
     programs: [0],
@@ -99,11 +103,12 @@ const fsSource = {
   floor: frag_floor
 }
 
-function SubsribeToEvents(){
+function SubsribeToEvents(gl){
   // Mouse Events
   window.addEventListener('resize', function(event){
     windowSize.x = window.innerWidth
     windowSize.y = window.innerHeight
+    ResizeCanvas(gl.canvas);
   });
   window.addEventListener("mouseup",(event)=>{
     isDown = false
@@ -112,6 +117,7 @@ function SubsribeToEvents(){
     accumulated.theta = max(min(accumulated.theta,settings.controls.maxTheta),settings.controls.minTheta)
     diff.alpha = 0
     diff.theta = 0
+    userIdling = 0
   })
   window.addEventListener('mousedown',(event)=>{
     event.preventDefault();
@@ -125,6 +131,7 @@ function SubsribeToEvents(){
       diff.alpha = (event.clientX/windowSize.x-cursorAnchor.x)*2
       diff.theta = (event.clientY/windowSize.y-cursorAnchor.y)*2
     }
+    userIdling = 0
   })
   window.addEventListener("wheel", event => {
     event.preventDefault()
@@ -132,21 +139,32 @@ function SubsribeToEvents(){
     if(accumulated.radius+delta > settings.controls.minRadius && accumulated.radius+delta<settings.controls.maxRadius){
       accumulated.radius += delta
     }
+    userIdling = 0
+
   },{passive:false});
   
   window.addEventListener('keydown', eve=>{
     if(!parameters.isMoving){
       arrowHandler?.(eve.key,parameters,accumulated)
     }
+    userIdling = 0
   })
 }
 
 function InitUI(){
+  if(MobileCheck()){
+    promptTxt = 'Hey Mobile Users! Mobile Support is coming. Use a laptop for full experience.'
+  }
+
   const renderBtn = document.querySelector("button#renderMode");
   const shaderBtn = document.querySelector("button#shaderMode");
   const colorBtn = document.querySelector("button#colorMode");
   const modelBtn = document.querySelector("button#modelMode");
   const regenerateBtn = document.querySelector("button#regenerate");
+  const titleButton = document.querySelector("button#title")
+  titleButton.onclick= ()=>{window.location.href='https://www.qwertyqwh.com';}
+  titleButton.onmouseenter= (eve)=>{ titleButton.textContent = "Visit" }
+  titleButton.onmouseout = (eve)=>{titleButton.textContent = "GLMaze by QWH"}
   renderBtn.onclick = (val)=>{
     parameters.isOrtho = !parameters.isOrtho
     renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
@@ -169,7 +187,7 @@ function InitUI(){
   renderBtn.textContent = parameters.isOrtho? "Orthographic" : "Perspective"
   shaderBtn.textContent = renderModes[curRenderMode];
   modelBtn.textContent = sceneModes[curSceneMode]
-  colorBtn.textContent = "Color";
+  colorBtn.textContent = "Change Color";
 }
 
 
@@ -180,8 +198,9 @@ function main() {
   curLights = GenerateLights(curPalette)
   parameters.maze = new Maze(settings.mazeParams)
   //HTML stuff
-  SubsribeToEvents()
+  const promptBox = document.querySelector("#prompt");
   InitUI()
+  promptBox.textContent = promptTxt
   const canvas = document.querySelector("canvas#gl");
   const gl = canvas.getContext("webgl");
   // Support check
@@ -189,6 +208,7 @@ function main() {
     alert("WebGL not supported.");
     return;
   }
+  SubsribeToEvents(gl)
   // This is to prevent pixel size mismatch
   ResizeCanvas(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -209,14 +229,14 @@ function main() {
   // Bind the texture to texture unit 0
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  programInfos.matcap.forEach((val)=>{
+  programInfos.Solid.forEach((val)=>{
     // Tell the shader we bound the texture to texture unit 0
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
-  programInfos.wire.forEach((val)=>{
+  programInfos.Wire.forEach((val)=>{
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
-  InitCharacter(parameters,accumulated,sceneGeometries.maze.instance);
+  InitCharacter(parameters,accumulated,sceneGeometries.Maze.instance);
   let then = 0;
   let elapse = 0;
   let start;
@@ -234,15 +254,15 @@ function main() {
     parameters.radius = Interpolate(parameters.radius,accumulated.radius,0.96)
     parameters.fogHeight = Interpolate(parameters.fogHeight,accumulated.fogHeight,0.98)
     parameters.fogStart = Interpolate(parameters.fogStart,accumulated.fogStart,0.98)
-    MoveCharacter(parameters,accumulated,sceneGeometries.maze.instance)
+    MoveCharacter(parameters,accumulated,sceneGeometries.Maze.instance)
     parameters.lights = curLights
     parameters.palette = curPalette
     parameters.elapse = elapse
     renderMode = renderModes[curRenderMode]
     parameters.model = sceneModes[curSceneMode]
     parameters.curGeometries = sceneGeometries[parameters.model]
-
-    if(parameters.model == 'maze'){
+    
+    if(parameters.model == 'Maze'){
       UpdateCloudTexture(gl,cloudProgramInfo,buffers,parameters,texture)
     }
     // Tell WebGL we want to affect texture unit 0
@@ -252,6 +272,15 @@ function main() {
     // gl.viewport(0, 0, 4096, 4096);
     // drawClouds(gl,cloudProgramInfo,buffers.cloud,parameters)
     // drawPavilions(gl,cloudProgramInfo,buffers.pavilion,parameters,true)
+    if(userIdling == 0){
+      promptBox.style.opacity = 0
+      promptBox.style.bottom = '10vh'
+    }
+    userIdling+= parameters.deltaTime
+    if(userIdling >= 4){
+      promptBox.style.opacity = 1
+      promptBox.style.bottom = '15vh'
+    }
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

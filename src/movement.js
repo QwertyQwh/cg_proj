@@ -1,12 +1,23 @@
 import { floor, pi } from "mathjs"
-import { IsMazeIndexValid, ProperMod, maze2worldByNode } from "./utils/utils"
+import { IsDirMovable, IsMazeIndexValid, ProperMod, maze2worldByNode } from "./utils/utils"
 import { settings } from "./settings"
+import { vec3 } from "gl-matrix"
 
 const movementVectors = [[0,-1],[-1,0],[0,1],[1,0]]
 
 const arrowHandler = (key,parameters,accumulated)=>{
+    if(key == 'Space' || key == " "){
+        accumulated.radius = settings.character.followDist
+        return;
+    }
     const vec = GetMovementVector(parameters.cameraAlpha,key)
+
     if(vec && IsMazeIndexValid(accumulated.node.i +vec[0],accumulated.node.j+vec[1])){
+        if(!IsDirMovable(parameters.maze.nodes[accumulated.node.i][accumulated.node.j],vec)){
+            return
+        }
+        const prev = vec3.create()
+        vec3.set(prev,...accumulated.characterPos)
         accumulated.radius = settings.character.followDist
         accumulated.node.i += vec[0]
         accumulated.node.j += vec[1]
@@ -14,7 +25,15 @@ const arrowHandler = (key,parameters,accumulated)=>{
         accumulated.characterPos[0] = worldPos.x
         accumulated.characterPos[1] = worldPos.y+settings.character.height
         accumulated.characterPos[2] = worldPos.z
+        vec3.set(parameters.travelVec,...accumulated.characterPos)
+        vec3.sub(parameters.travelVec,prev,parameters.travelVec)
+        if(parameters.maze.nodes[accumulated.node.i][accumulated.node.j].pavilion == 1){
+            accumulated.scale = 0
+        }else{
+            accumulated.scale = 1
+        }
     }
+
 
 }
 

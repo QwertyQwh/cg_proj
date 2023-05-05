@@ -202,8 +202,8 @@ function GenerateSceneProgramInfo(gl, programs){
               },
               };
         return {
-            wire: [wireInfo,flagWireInfo,cloudWireInfo,floorWireInfo],
-            matcap: [matcapInfo,flagMatcapInfo,cloudMatcapInfo,floorMatcapInfo],
+            Wire: [wireInfo,flagWireInfo,cloudWireInfo,floorWireInfo],
+            Solid: [matcapInfo,flagMatcapInfo,cloudMatcapInfo,floorMatcapInfo],
         }
 }
 

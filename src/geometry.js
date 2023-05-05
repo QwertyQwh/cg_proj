@@ -36,7 +36,7 @@ function initMazeBuffers(gl,flagInstance,pavilionInstance,maze) {
   for(let i = 0; i<mazeP.width; i++){
     for(let j = 0; j< mazeP.height; j++){
       AddMazeBlock(maze.nodes[i][j],{...blockParam,width:mazeP.width,height:mazeP.height}, positions,normals,indices,wires,info)
-      if(maze.nodes[i][j].deadEnd && random(0,1)>mazeP.weights.pavilion){
+      if(maze.nodes[i][j].pavilion){
         const {x,y,z} = maze2world(i,j,maze.nodes[i][j].indices.h)
         pavilionInstance.push({translation:[x,y,z],scale:[1,1,1], rotateY:0})
       }
@@ -329,7 +329,7 @@ function initUpperBuffers(gl) {
     wireIndices: indexWireBuffer,
     vertexCount: 0,
   }  
-  const modelParams = {smoothen:false,scale:0.1};
+  const modelParams = {smoothen:false,scale:0.12};
   AddUpper(positions,normals,indices,wires,info,modelParams)
   info.vertexCount = indices.length
   info.wireCount = wires.length
@@ -360,7 +360,7 @@ function initMiddleBuffers(gl) {
     wireIndices: indexWireBuffer,
     vertexCount: 0,
   }  
-  const modelParams = {smoothen:false,scale:0.1};
+  const modelParams = {smoothen:false,scale:0.12};
   AddMiddle(positions,normals,indices,wires,info,modelParams)
   info.vertexCount = indices.length
   info.wireCount = wires.length
@@ -391,7 +391,7 @@ function initLowerBuffers(gl) {
     wireIndices: indexWireBuffer,
     vertexCount: 0,
   }  
-  const modelParams = {smoothen:false,scale:0.1};
+  const modelParams = {smoothen:false,scale:0.12};
   AddLower(positions,normals,indices,wires,info,modelParams)
   info.vertexCount = indices.length
   info.wireCount = wires.length
@@ -410,16 +410,16 @@ function initLowerBuffers(gl) {
 function initBuffers(gl,instanceInfo,maze){
   const modelFlat = initModelBuffers(gl,false) 
   const modelSmooth = initModelBuffers(gl,true)
-  const mazeG = initMazeBuffers(gl,instanceInfo.maze.instance.flag, instanceInfo.maze.instance.pavilion,maze)
-  const flag = initFlagBuffers(gl,instanceInfo.maze.instance.flag)
-  const cloud = initCloudBuffers(gl,instanceInfo.maze.instance.cloud)
+  const mazeG = initMazeBuffers(gl,instanceInfo.Maze.instance.flag, instanceInfo.Maze.instance.pavilion,maze)
+  const flag = initFlagBuffers(gl,instanceInfo.Maze.instance.flag)
+  const cloud = initCloudBuffers(gl,instanceInfo.Maze.instance.cloud)
   const floor = InitFloorBuffers(gl)
-  const domes = initDomeBuffers(gl,instanceInfo.maze.instance.dome)
+  const domes = initDomeBuffers(gl,instanceInfo.Maze.instance.dome)
   const middle = initMiddleBuffers(gl)
   const upper = initUpperBuffers(gl)
   const lower = initLowerBuffers(gl)
   const pavilion = initPavilionBuffers(gl)
-  return {modelFlat:modelFlat,modelSmooth:modelSmooth,maze:mazeG, flag: flag,cloud: cloud,floor: floor,dome:domes,upper,middle, lower,pavilion: pavilion};
+  return {Suzanne:modelFlat,SmoothSuzanne:modelSmooth,maze:mazeG, flag: flag,cloud: cloud,floor: floor,dome:domes,upper,middle, lower,pavilion: pavilion};
 }
 
 

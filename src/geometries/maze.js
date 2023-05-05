@@ -1,5 +1,6 @@
 
-
+import { floor, random } from "mathjs"
+import { settings } from "../settings"
 class Node {
     constructor(indices,children,maze) {
       this.indices = indices
@@ -15,6 +16,7 @@ class Node {
         }
       }
       this.from = null // This is used for stair generation
+      this.ascending = 0
       this.to = null
       this.visited = false
       this.maze = maze
@@ -95,6 +97,9 @@ class Node {
           // console.log(next.indices)
           next.Visit()
         }
+        if(this.deadEnd&& random(0,1)>this.maze.weights.pavilion){
+          this.pavilion = true
+        }
     }
     PostVisit(prev,prevDir,isStart){
       let count = 0
@@ -138,16 +143,20 @@ class Node {
             default:
               break;
             }
+            if(!settings.mazeParams.risingCetner){
+              elevate *= -1
+            }
             if(elevate == 0){
               elevate = Math.random()>.5? 1:-1
             }
           }
-          if(prev.indices.h+elevate<0){
-            this.from = null
-            this.indices.h = prev.indices.h
-          }else{
+          
+    
             this.indices.h = prev.indices.h+elevate
-          }
+            this.ascending = elevate
+            if(this.indices.h<this.maze.minh){
+              this.maze.minh = this.indices.h
+            }
           }
           if(leftAvail){
             this.children.left.PostVisit(this,"right")
@@ -177,13 +186,14 @@ class Node {
               
               
   class Maze{
-   constructor({weights,hollowCondition, width, height, start, end, centerLocation}){
+   constructor({weights,hollowCondition, width, height, start, end}){
     this.weights = weights;
     // A function in the form (i,j) =>{ture/false}
     this.hollowCondition = hollowCondition;
     this.start;
     this.end;
-    this.centerLocation = centerLocation
+    this.minh = 100;
+    this.centerLocation = {i: floor(width/2), j:floor(height/2)}
     this.nodes = Array(width)
     for(let i = 0; i<width; i++){
       this.nodes[i] = []
@@ -193,9 +203,9 @@ class Node {
         if(this.hollowCondition(i,j)){
           node.hollow = true
         }
+      }
     }
-    }
-      for(let i = 0; i<width; i++){
+    for(let i = 0; i<width; i++){
       for(let j = 0; j<height; j++){
         this.nodes[i][j].children.left = i-1>=0 && !this.hollowCondition(i-1,j)? this.nodes[i-1][j]:null
         this.nodes[i][j].children.right = i+1<width&& !this.hollowCondition(i+1,j)? this.nodes[i+1][j]:null
@@ -205,6 +215,11 @@ class Node {
     }
     this.nodes[start.i][start.j].Visit()
     this.nodes[start.i][start.j].PostVisit(null,null,true)
+    for(let i = 0; i<width; i++){
+      for(let j = 0; j<height; j++){
+        this.nodes[i][j].indices.h-=this.minh
+      }
+    }
   }
 
 
