@@ -130,6 +130,7 @@ const padding = 0.005
 
   
   function AddFlatGround(node,{width,height,size,gap,heightModifier,baseHeight},positions,normals,indices,wires,info){
+    const offset = 0.03
     const centerParam = {
         left: (node.indices.i-width/2+gap)*size,
         bottom:  0,
@@ -140,31 +141,31 @@ const padding = 0.005
       }
       AddCube(positions,normals,indices,wires,info,centerParam)
       if(node.path.left){
-        centerParam.left = (node.indices.i-width/2)*size
+        centerParam.left = (node.indices.i-width/2)*size-offset
         centerParam.near = (node.indices.j-height/2+gap)*size
-        centerParam.width = gap*size
+        centerParam.width = gap*size+offset*2
         centerParam.depth = (1-gap*2)*size
         AddCube(positions,normals,indices,wires,info,centerParam)
       }
       if(node.path.right){
-        centerParam.left = (node.indices.i+1-width/2-gap)*size
+        centerParam.left = (node.indices.i+1-width/2-gap)*size-offset
         centerParam.near = (node.indices.j-height/2+gap)*size
-        centerParam.width = gap*size
+        centerParam.width = gap*size+offset*2
         centerParam.depth = (1-gap*2)*size
         AddCube(positions,normals,indices,wires,info,centerParam)
       }
       if(node.path.forward){
         centerParam.left = (node.indices.i-width/2+gap)*size
-        centerParam.near = (node.indices.j-height/2+1-gap)*size
+        centerParam.near = (node.indices.j-height/2+1-gap)*size-offset
         centerParam.width = (1-gap*2)*size
-        centerParam.depth = gap*size
+        centerParam.depth = gap*size+offset*2
         AddCube(positions,normals,indices,wires,info,centerParam)
       }
       if(node.path.backward){
         centerParam.left = (node.indices.i-width/2+gap)*size
-        centerParam.near = (node.indices.j-height/2)*size
+        centerParam.near = (node.indices.j-height/2)*size-offset
         centerParam.width = (1-gap*2)*size
-        centerParam.depth = gap*size
+        centerParam.depth = gap*size+offset*2
         AddCube(positions,normals,indices,wires,info,centerParam)
       }
   }

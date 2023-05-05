@@ -1,5 +1,5 @@
 const vert= /*glsl*/ `
-precision highp float;
+precision lowp float;
 attribute vec4 aVertexPosition;
 attribute vec4 aVertexNormal;
 uniform mat4 uTranslationMatrix;

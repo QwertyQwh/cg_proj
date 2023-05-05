@@ -1,5 +1,5 @@
 const frag = /*glsl*/ `
-precision highp float;
+precision lowp float;
 varying vec3 vPosition;
 varying vec3 vNormal;
 uniform vec4 uBackground;

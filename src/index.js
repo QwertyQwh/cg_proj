@@ -25,7 +25,7 @@ import { vec3 } from 'gl-matrix'
 
 let userIdling = 0
 const PI = 3.1415926
-const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0],node:{i: 0,j:0},scale:1};
+const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50*settings.blockParams.size,fogHeight:3*settings.blockParams.size,fogStart:0,characterPos:[0,0,0],node:{i: 0,j:0},scale:1};
 const cursorAnchor = {x:0,y:0};
 const diff = {alpha:0,theta:0};
 let isDown = false;
@@ -42,14 +42,13 @@ let parameters = {
   isOrtho: true,
   cameraTheta: PI/4,
   cameraAlpha:4*PI/4,
-  cameraRaiuds :3,
-  radius: 300,
+  radius: 300*settings.blockParams.size,
   floor: 0,
   palette: null,
   lights: null,
   model: "Maze",
-  fogStart: 40,
-  fogHeight: 80,
+  fogStart: 40*settings.blockParams.size,
+  fogHeight: 80*settings.blockParams.size,
   elapse:0,
   deltaTime:0,
   curGeometries: null,
@@ -57,7 +56,7 @@ let parameters = {
   rotation: null,
   characterPos: [0,0,0],
   isMoving: false,
-  totalTravelTime: 0.8,
+  totalTravelTime: 0.6,
   travelVec: vec3.create(),
   traveledTime: 0.
 }

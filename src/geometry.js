@@ -47,7 +47,7 @@ function initMazeBuffers(gl,flagInstance,pavilionInstance,maze) {
     offsetY:8,
     offsetX: (-mazeP.width*.5 +1.)*blockParam.size, 
     offsetZ: (-mazeP.height*.5+1.)*blockParam.size, 
-    scale:1.,
+    scale:1.* settings.blockParams.size,
     smoothen: false
   }
   AddTower(positions,normals,indices,wires,info,cornerParams)
@@ -266,7 +266,7 @@ function initDomeBuffers(gl,instanceInfo) {
     bound: 3*20*blockParam.size,
     height: 3
   }
-  const modelParams = {smoothen:false};
+  const modelParams = {smoothen:false,scale:settings.blockParams.size};
   AddDome(positions,normals,indices,wires,info,modelParams)
   AddDomes(domeParams,instanceInfo)
   info.vertexCount = indices.length
@@ -298,7 +298,7 @@ function initPavilionBuffers(gl,instanceInfo) {
     wireIndices: indexWireBuffer,
     vertexCount: 0,
   }  
-  const modelParams = {smoothen:false,scale:0.25};
+  const modelParams = {smoothen:false,scale:0.25*settings.blockParams.size};
   AddPavilion(positions,normals,indices,wires,info,modelParams)
   info.vertexCount = indices.length
   info.wireCount = wires.length
