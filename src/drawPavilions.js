@@ -4,7 +4,7 @@ import { GetCameraMatrix } from "./camera";
 import { settings } from "./settings";
 import { ProperMod } from "./utils/utils";
 
-function drawClouds(gl, programInfo, buffer, parameters,clear = true) {
+function drawPavilions(gl, programInfo, buffer, parameters,clear = false) {
     if(clear){
       gl.clearColor(0., 0., 0., 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT );
@@ -18,13 +18,6 @@ function drawClouds(gl, programInfo, buffer, parameters,clear = true) {
       controlMatrix,
       -pi*.5
     )
-    // const cameraPos = [50,50,-]
-    // mat4.lookAt(
-    //   controlMatrix,
-    //   cameraPos,
-    //   [0,0,0],
-    //   [0,1,0]
-    //   )
     const rotationMatrix = mat4.create()
     const translationMatrix = mat4.create()
     const scaleMatrix = mat4.create()
@@ -62,13 +55,13 @@ function drawClouds(gl, programInfo, buffer, parameters,clear = true) {
         )
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
 
-      const instances = parameters.curGeometries.instance['cloud']
+      const instances = parameters.curGeometries.instance['pavilion']
       instances.forEach((val) => {
         mat4.identity(translationMatrix)
         mat4.translate(
           translationMatrix,
           translationMatrix,
-          [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed+settings.cloud.bound*1.6,settings.cloud.bound*3.2) -settings.cloud.bound*1.6,val.translation[1],val.translation[2]]
+          val.translation
         )
         mat4.identity(scaleMatrix)
         mat4.scale(scaleMatrix,scaleMatrix,val.scale)
@@ -82,6 +75,7 @@ function drawClouds(gl, programInfo, buffer, parameters,clear = true) {
           false,
           translationMatrix
         );
+        console.log(val.scale)
         gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
       });
 
@@ -126,4 +120,4 @@ function drawClouds(gl, programInfo, buffer, parameters,clear = true) {
 
  
 
-  export { drawClouds };
+  export { drawPavilions };

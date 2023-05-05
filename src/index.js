@@ -9,16 +9,17 @@ import frag_floor from './shaders/frag_floor'
 import {Maze} from './geometries/maze'
 import {Interpolate, ResizeCanvas } from './utils/utils'
 import { initBuffers } from './geometry'
-import { drawScene } from './drawscene'
-import { max,min } from 'mathjs'
+import { drawScene } from './drawScene'
+import { max,min, pi } from 'mathjs'
 import {InitScenePrograms, GenerateSceneProgramInfo, InitCloudPrograms, GenerateCloudProgramInfo} from './utils/programs'
 import { GeneratePalette } from './palette'
 import { GenerateLights } from './lights'
-import { settings,Randomize } from './settings'
+import { settings,Randomize, SetAllHorizontal } from './settings'
 import { GetCloudTexture, UpdateCloudTexture } from './cloudTexture'
 import { InitCharacter, MoveCharacter} from './player'
 import {arrowHandler } from './movement'
-import { drawClouds } from './drawclouds'
+import { drawClouds } from './drawClouds'
+import { drawPavilions } from './drawPavilions'
 
 const PI = 3.1415926
 const accumulated = {theta:PI/4,alpha:-1*PI/4,radius:50,fogHeight:3,fogStart:0,characterPos:[0,0,0],node:{i: 0,j:0}};
@@ -53,20 +54,23 @@ let parameters = {
   rotation: null,
   characterPos: [0,0,0],
   isMoving: false,
-  totalTravelTime: 1.,
+  totalTravelTime: 4.,
   traveledTime: 0.
 }
 
 const sceneGeometries = {
   maze:{
-    geometries: ["maze",'flag','cloud','floor','dome','character'],
+    geometries: ["maze",'flag','cloud','floor','dome','pavilion','upper','middle','lower'],
     instance : {
       flag:[],
       cloud:[],
       dome: [],
-      character: [{translation: [0,0,0], scale:[1,1,1]}],
+      upper: [{translation: [0,0,0], scale:[1,1,1], rotateY: pi*0.25}],
+      middle: [{translation: [0,0,0], scale:[1,1,1], rotateY: pi*0.25}],
+      lower: [{translation: [0,0,0], scale:[1,1,1], rotateY: pi*0.25}],
+      pavilion:[],
     }, 
-    programs: [0,1,2,3,0,0],
+    programs: [0,1,2,3,0,0,0,0,0],
   },
   modelFlat:{
     geometries: ['modelFlat'],
@@ -171,6 +175,7 @@ function InitUI(){
 
 function main() {
   Randomize()
+  // SetAllHorizontal()
   curPalette = GeneratePalette();
   curLights = GenerateLights(curPalette)
   parameters.maze = new Maze(settings.mazeParams)
@@ -211,7 +216,7 @@ function main() {
   programInfos.wire.forEach((val)=>{
     gl.uniform1i(val.uniformLocations.uMatSampler, 0);
   })
-  InitCharacter(parameters,accumulated,sceneGeometries.maze.instance.character);
+  InitCharacter(parameters,accumulated,sceneGeometries.maze.instance);
   let then = 0;
   let elapse = 0;
   let start;
@@ -229,7 +234,7 @@ function main() {
     parameters.radius = Interpolate(parameters.radius,accumulated.radius,0.96)
     parameters.fogHeight = Interpolate(parameters.fogHeight,accumulated.fogHeight,0.98)
     parameters.fogStart = Interpolate(parameters.fogStart,accumulated.fogStart,0.98)
-    MoveCharacter(parameters,accumulated,sceneGeometries.maze.instance.character)
+    MoveCharacter(parameters,accumulated,sceneGeometries.maze.instance)
     parameters.lights = curLights
     parameters.palette = curPalette
     parameters.elapse = elapse
@@ -238,7 +243,7 @@ function main() {
     parameters.curGeometries = sceneGeometries[parameters.model]
 
     if(parameters.model == 'maze'){
-      UpdateCloudTexture(gl,cloudProgramInfo,buffers.cloud,parameters,texture)
+      UpdateCloudTexture(gl,cloudProgramInfo,buffers,parameters,texture)
     }
     // Tell WebGL we want to affect texture unit 0
 
@@ -246,6 +251,7 @@ function main() {
       drawScene(gl, programInfos[renderMode], buffers, parameters,renderMode,elapse);
     // gl.viewport(0, 0, 4096, 4096);
     // drawClouds(gl,cloudProgramInfo,buffers.cloud,parameters)
+    // drawPavilions(gl,cloudProgramInfo,buffers.pavilion,parameters,true)
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

@@ -1,18 +1,26 @@
 import { vec3 } from "gl-matrix";
 import { settings } from "./settings";
 import { Aprox, maze2world } from "./utils/utils";
+import { pi, sin } from "mathjs";
 
-function InitCharacter(parameters,dest,instanceInfo){
+function InitCharacter(parameters,accumulated,instanceInfo){
     const mazeP = settings.mazeParams
-    dest.node = {i:mazeP.start.i,j:mazeP.start.j}
+    accumulated.node = {i:mazeP.start.i,j:mazeP.start.j}
     
     const {x,y,z} = maze2world(mazeP.start.i, settings.blockParams.baseHeight,mazeP.start.j)
-    parameters.characterPos = [x,y,z]
-    dest.characterPos = [x,y,z]
-    instanceInfo[0].translation = [x,y,z]
+    parameters.characterPos = [x,y+settings.character.height,z]
+    accumulated.characterPos = [x,y+settings.character.height,z]
+    instanceInfo.upper[0].translation = [x,y,z]
+    instanceInfo.middle[0].translation = [x,y,z]
+    instanceInfo.lower[0].translation = [x,y,z]
 }
 
 function MoveCharacter(parameters,accumulated,instanceInfo){
+    //rotations
+    instanceInfo.upper[0].rotateY = 8*sin(parameters.elapse/pi)
+    instanceInfo.lower[0].rotateY = -8*sin(parameters.elapse/pi)
+
+    // translations
     let eq = true
     parameters.characterPos.forEach((val,ind) => {
         if(!Aprox(val,accumulated.characterPos[ind])){
@@ -36,17 +44,23 @@ function MoveCharacter(parameters,accumulated,instanceInfo){
     if(parameters.traveledTime>parameters.totalTravelTime){
         vec3.copy(cur,dest)
     }else{
-        vec3.normalize(dir,dir);
+        // vec3.normalize(dir,dir);
         vec3.scale(dir,dir,1-step);
         vec3.sub(cur,dest,dir);
     }
+    // Move the player above the ground 
     parameters.traveledTime+= parameters.deltaTime
     parameters.characterPos.forEach((val,ind) => {
         parameters.characterPos[ind] = cur[ind]
     });
-    instanceInfo[0].translation[0] = cur[0]
-    instanceInfo[0].translation[1] = cur[1]
-    instanceInfo[0].translation[2] = cur[2]
+
+    cur.forEach((val,ind)=>{
+        instanceInfo.upper[0].translation[ind] = val
+        instanceInfo.middle[0].translation[ind] = val
+        instanceInfo.lower[0].translation[ind] = val
+    }) 
+
+
 
 }
 

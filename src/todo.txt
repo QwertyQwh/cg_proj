@@ -1,11 +1,6 @@
-generate pavilion shadows as well
 finish the castle
-lookup fire shader
-
-character:
+add depth_of_field
+fix the movement problem
 
 
 uibuttons:
-
-add depth_of_field
-fix the movement problem

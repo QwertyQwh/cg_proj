@@ -1,4 +1,5 @@
-import { drawClouds } from "./drawclouds";
+import { drawPavilions } from "./drawPavilions";
+import { drawClouds } from "./drawClouds";
 
     const targetTextureHeight = 4096;
     const targetTextureWidth = 4096;
@@ -41,7 +42,7 @@ function UpdateCloudTexture(gl, programInfo, buffer, parameters,targetTexture){
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
     // attach the texture as the first color attachment
     gl.viewport(0, 0, targetTextureWidth, targetTextureHeight);
-    drawClouds(gl, programInfo, buffer, parameters)
+    drawClouds(gl, programInfo, buffer.cloud, parameters)
     return targetTexture
 }
 

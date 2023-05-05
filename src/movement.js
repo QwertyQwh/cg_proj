@@ -12,7 +12,7 @@ const arrowHandler = (key,parameters,accumulated)=>{
         accumulated.node.j += vec[1]
         const worldPos = maze2worldByNode(parameters.maze, accumulated.node.i,accumulated.node.j)
         accumulated.characterPos[0] = worldPos.x
-        accumulated.characterPos[1] = worldPos.y
+        accumulated.characterPos[1] = worldPos.y+settings.character.height
         accumulated.characterPos[2] = worldPos.z
     }
 

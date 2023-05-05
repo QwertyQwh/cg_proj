@@ -32,11 +32,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
     vec3.set(camera, cameraPos[0],cameraPos[1],cameraPos[2])
     vec3.normalize(camera,camera);
     const rotationMatrix = mat4.create()
-    mat4.rotate(
-      rotationMatrix,
-      rotationMatrix,
-      pi*1.25,
-      [0,1,0])
+
       const translationMatrix = mat4.create()
       const scaleMatrix = mat4.create()
 
@@ -124,6 +120,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
               mat4.identity(translationMatrix)
               mat4.identity(scaleMatrix)
+              mat4.identity(rotationMatrix)
               gl.uniformMatrix4fv(
                 programInfo.uniformLocations.scaleMatrix,
                 false,
@@ -137,6 +134,8 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
               if(instances){
             instances.forEach((val) => {
               mat4.identity(translationMatrix)
+              mat4.identity(rotationMatrix)
+              mat4.identity(scaleMatrix)
               if(i == 2){
                   mat4.translate(
                     translationMatrix,
@@ -150,13 +149,27 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
                     val.translation
                     )
                 }
-                if(i == 5){
-                  // console.log(val.translation)
-                }
+                mat4.rotate(
+                rotationMatrix,
+                rotationMatrix,
+                val.rotateY??0,
+                [0,1,0])
+                mat4.scale(scaleMatrix,scaleMatrix,val.scale)
+                
               gl.uniformMatrix4fv(
                 programInfo.uniformLocations.translationMatrix,
                 false,
                 translationMatrix
+              );
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.rotationMatrix,
+                false,
+                rotationMatrix
+              );
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.scaleMatrix,
+                false,
+                scaleMatrix
               );
               gl.drawElements(gl.TRIANGLES, buffer.vertexCount, type, offset);
             });
@@ -168,6 +181,13 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
         case 'wire':
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireIndices);
           mat4.identity(translationMatrix)
+          mat4.identity(rotationMatrix)
+          mat4.identity(scaleMatrix)
+          gl.uniformMatrix4fv(
+            programInfo.uniformLocations.scaleMatrix,
+            false,
+            scaleMatrix
+          );
           gl.uniformMatrix4fv(
             programInfo.uniformLocations.translationMatrix,
             false,
@@ -176,11 +196,13 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
           if(instances){
             instances.forEach((val) => {
               mat4.identity(translationMatrix)
+              mat4.identity(rotationMatrix)
+              mat4.identity(scaleMatrix)
               if(i == 2){
                   mat4.translate(
                     translationMatrix,
                     translationMatrix,
-                    [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
+                    [ProperMod(val.translation[0] + parameters.elapse*settings.cloud.speed+settings.cloud.bound*1.3,settings.cloud.bound*2) -settings.cloud.bound,val.translation[1],val.translation[2]]
                   )
                 }else{
                   mat4.translate(
@@ -189,13 +211,28 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
                     val.translation
                     )
                 }
-  
+                mat4.rotate(
+                rotationMatrix,
+                rotationMatrix,
+                val.rotateY??0,
+                [0,1,0])
+                mat4.scale(scaleMatrix,scaleMatrix,val.scale)
               gl.uniformMatrix4fv(
                 programInfo.uniformLocations.translationMatrix,
                 false,
                 translationMatrix
               );
-            gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.rotationMatrix,
+                false,
+                rotationMatrix
+              );
+              gl.uniformMatrix4fv(
+                programInfo.uniformLocations.scaleMatrix,
+                false,
+                scaleMatrix
+              );
+              gl.drawElements(gl.LINES, buffer.wireCount, type, offset);
             });
           }else{
             gl.drawElements(gl.LINES, buffer.wireCount, type, offset);

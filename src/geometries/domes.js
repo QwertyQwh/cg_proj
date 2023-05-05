@@ -17,9 +17,9 @@ function AddDomes({count,mazeWidth,mazeDepth,bound,height},instanceInfo){
         if(val[0]>-mazeWidth*.5&&val[0]<mazeWidth*.5&&val[1]>-mazeDepth*.5&& val[1]<mazeDepth*.5){
             return;
         }
-        const offsetY = height* random(-1,0)
+        const offsetY = height* random(-1.1,-0.1)
         // AddDome(positions,normals,indices,wires,info,{offsetX: val[0],offsetZ: val[1],offsetY:offsetY})
-        instanceInfo.push({translation:[val[0],offsetY,val[1]],scale :[0.5,0.5,0.5]})
+        instanceInfo.push({translation:[val[0],offsetY,val[1]],scale :[1.,1.,1.]})
     })
 }
 

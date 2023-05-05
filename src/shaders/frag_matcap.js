@@ -50,7 +50,6 @@ void main(void) {
     gl_FragColor = mix(gl_FragColor,uLightColorLeft*.7,shadow*.6*maskFactor);
   }
   gl_FragColor = vec4(gl_FragColor.xyz,1.);
-
 }
 `;
 export default frag 

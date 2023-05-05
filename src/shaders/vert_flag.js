@@ -19,8 +19,9 @@ void main(void) {
   gl_Position.z = (sin((gl_Position.x+offset)*freq)-sin(offset*freq))*amplify;
   vNormal = vec3(-cos((gl_Position.x+offset)*freq)*amplify * normAmplify,0.,1.);
   vNormal = (uRotationMatrix* vec4(vNormal,1.)).xyz;
-  gl_Position = uProjectionMatrix * uControlMatrix * uTranslationMatrix* uRotationMatrix*gl_Position; 
-  vPosition = aVertexPosition.xyz;
+  gl_Position = uTranslationMatrix* uRotationMatrix*gl_Position; 
+  vPosition = gl_Position.xyz;
+  gl_Position = uProjectionMatrix * uControlMatrix * gl_Position;
 }
 `;
 export default vert 

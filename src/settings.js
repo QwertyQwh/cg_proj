@@ -35,6 +35,7 @@ const settings = {
         speed: 3,
         curveFunc: (t)=> (-cos(pi*t)+1)*.5,
         curveGrad: (t)=>  .5*pi*sin(pi*t),
+        height:0.5,
     },
     environment:{
         startingColor: 0,
@@ -51,4 +52,8 @@ function Randomize(){
     settings.mazeParams.weights.stair = random(0.2,0.8)
     settings.environment.startingColor = floor(random(0,4))
 }
-export {settings,Randomize}
+function SetAllHorizontal(){
+    settings.mazeParams.weights.horizontal = 1.         
+}
+
+export {settings,Randomize,SetAllHorizontal}

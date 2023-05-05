@@ -11,10 +11,10 @@ varying vec3 vNormal;
 uniform float uTime;
 varying vec3 vPosition;
 void main(void) {
-  gl_Position = uTranslationMatrix * aVertexPosition;
+  gl_Position = uTranslationMatrix * uScaleMatrix* uRotationMatrix* aVertexPosition;
   vPosition = gl_Position.xyz;
   gl_Position = uProjectionMatrix * uControlMatrix * gl_Position;
-  vNormal = aVertexNormal.xyz;
+  vNormal = (uRotationMatrix*aVertexNormal).xyz;
 }
 `;
 export default vert 
