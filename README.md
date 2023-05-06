@@ -5,7 +5,7 @@ A random maze generator using WebGL, featuring wire/solid modes, color modes, re
 ## Usage
 
 ```cmd
-npm i install
+npm i
 ```
 
 and then 
