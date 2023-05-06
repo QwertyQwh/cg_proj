@@ -36,7 +36,7 @@ let curSceneMode = 0
 let curPalette 
 let curLights 
 const windowSize = {x:window.innerWidth,y:window.innerHeight}
-const promptTxt = "Use Arrow Keys to navigate. \r\n Drag and Zoom to move around. \r\n Press Space to refocus. "
+let promptTxt = "Use Arrow Keys to navigate. \r\n Drag and Zoom to move around. \r\n Press Space to refocus. "
 let parameters = {
   maze: null,
   isOrtho: true,
