@@ -6,7 +6,7 @@ const height = 20
 const settings = {
     mazeParams:{
         weights:{horizontal: 0.5, stair: 0.4, pavilion: 0.5 },
-        hollowCondition: (i,j)=> ((i>=floor(width/2)-2&& i<=floor(width/2)+2 && j>=floor(height/2)-2 && j<=floor(height/2)+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>width-3)) ||((i>width-3)&& (j>width-3)) ||((i>width-3)&& (j<2))   ),/*|| ((i>0 || j>0) && (i+j*2) %4 == 0) */
+        hollowCondition: (i,j)=> ((i>=floor(width/2)-2&& i<floor(width/2)+2 && j>=floor(height/2)-2 && j<floor(height/2)+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>width-3)) ||((i>width-3)&& (j>width-3)) ||((i>width-3)&& (j<2))   ),
         width:width,
         height:height,
         start:{i:0,j:2},
@@ -46,7 +46,11 @@ const settings = {
 function Randomize(){
     settings.mazeParams.width = floor(random(10,31))
     settings.mazeParams.height = floor(random(10,31))
-    settings.mazeParams.hollowCondition = (i,j)=> ((i>=floor(settings.mazeParams.width /2)-2&& i<= floor(settings.mazeParams.width /2)+2 && j>= floor(settings.mazeParams.height/2)-2 && j<=floor(settings.mazeParams.height/2)+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j<2)))
+    let holes = false
+    if(random(0,1)<0.5){
+        holes = true
+    }
+    settings.mazeParams.hollowCondition = (i,j)=> ((i>=floor(settings.mazeParams.width /2)-2&& i< floor(settings.mazeParams.width /2)+2 && j>= floor(settings.mazeParams.height/2)-2 && j<floor(settings.mazeParams.height/2)+2) || ((i<2)&& (j<2))|| ((i<2)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j>settings.mazeParams.height -3)) ||((i>settings.mazeParams.width -3)&& (j<2))|| (holes&& ((i>0 || j>0) && (i+j*2) %4 == 0)) )
     settings.blockParams.heightModifier = random(0.3,1.0)
     settings.mazeParams.weights.horizontal = random(0.1,0.9)
     settings.mazeParams.weights.stair = random(0.2,0.8)

@@ -26,6 +26,7 @@ function drawScene(gl, programInfos, buffers, parameters, shaderMode) {
       controlMatrix,
       cameraPos,
       parameters.characterPos,
+      // [0,0,0],
       [0,1,0]
       )
       const camera = vec3.create()

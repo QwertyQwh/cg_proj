@@ -13,6 +13,7 @@ import { AddPavilion } from "./geometries/pavilion";
 import { maze2world } from "./utils/utils";
 import { AddUpper,AddLower,AddMiddle } from "./geometries/character";
 import { InitCharacter } from "./player";
+import { AddCastle } from "./geometries/castle";
 function initMazeBuffers(gl,flagInstance,pavilionInstance,maze) {
   const positionBuffer = gl.createBuffer();
   const normalBuffer = gl.createBuffer();
@@ -61,8 +62,15 @@ function initMazeBuffers(gl,flagInstance,pavilionInstance,maze) {
   cornerParams.offsetX-=(mazeP.width-2.)*blockParam.size
   AddTower(positions,normals,indices,wires,info,cornerParams)
   flagInstance.push({translation:[cornerParams.offsetX,8,cornerParams.offsetZ],scale :[0.5,0.5,0.5],rotateY: pi*1.25})
-  // Random Towers
-
+  // castle
+  const castleParams = {
+    offsetY:11,
+    offsetX: .0-0.5*(mazeP.width%2),
+    offsetZ: .0-0.5*(mazeP.height%2),
+    scale:.8,
+  }
+  
+  AddCastle(positions,normals,indices,wires,info,castleParams)
   //Bind buffers to arrays
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
