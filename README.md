@@ -1,6 +1,6 @@
 # GLMaze
 
-A random maze generator using WebGL, featuring wire/solid modes, color modes, real-time shadows etc. The deployed version is available at https://www.qwertyqwh.com/doodle/index.html. (which is currenly under development and the rouing address might change )
+A random maze generator using WebGL, featuring wire/solid modes, color modes, real-time shadows etc. The deployed version is available at https://www.qwertyqwh.com/doodle/index.html. (which is currenly under development and the routing address might change )
 
 ## Usage
 
