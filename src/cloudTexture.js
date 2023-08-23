@@ -1,5 +1,5 @@
 import { drawPavilions } from "./drawPavilions";
-import { drawClouds } from "./drawClouds";
+import { drawClouds } from "./drawClouds.js";
 
     const targetTextureHeight = 4096;
     const targetTextureWidth = 4096;
