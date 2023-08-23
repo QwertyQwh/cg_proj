@@ -159,7 +159,7 @@ function InitUI(){
   const modelBtn = document.querySelector("button#modelMode");
   const regenerateBtn = document.querySelector("button#regenerate");
   const titleButton = document.querySelector("button#title")
-  titleButton.onclick= ()=>{window.location.href='https://www.qwertyqwh.com';}
+  titleButton.onclick= ()=>{window.location.href='https://www.qwertyqwh.com/#/home';}
   titleButton.onmouseenter= (eve)=>{ titleButton.textContent = "Visit" }
   titleButton.onmouseout = (eve)=>{titleButton.textContent = "GLMaze by QWH"}
   renderBtn.onclick = (val)=>{
